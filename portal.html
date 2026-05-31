@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Portal Executivo · 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07090F;--s1:#0E1118;--s2:#141824;--s3:#1B2030;--s4:#202840;
+  --b1:#242C42;--b2:#2E3855;
+  --text:#F0F4FF;--t2:#C8D0E8;--muted:#8E9BBF;--dim:#5A6888;
+  --blue:#4F8EF7;--blue-d:rgba(79,142,247,.12);--blue-b:rgba(79,142,247,.25);
+  --green:#22C55E;--green-d:rgba(34,197,94,.1);--green-b:rgba(34,197,94,.22);
+  --red:#EF4444;--red-d:rgba(239,68,68,.1);--red-b:rgba(239,68,68,.22);
+  --yellow:#F59E0B;--yel-d:rgba(245,158,11,.1);--yel-b:rgba(245,158,11,.22);
+  --teal:#14B8A6;--teal-d:rgba(20,184,166,.1);--teal-b:rgba(20,184,166,.22);
+  --purple:#A855F7;--pur-d:rgba(168,85,247,.1);--pur-b:rgba(168,85,247,.25);
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* ── LOGIN ── */
+#screen-login{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#screen-login::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--b1) 1px,transparent 1px),
+    linear-gradient(90deg,var(--b1) 1px,transparent 1px);
+  background-size:52px 52px;
+  opacity:.35;
+  animation:gridDrift 25s linear infinite;
+}
+@keyframes gridDrift{0%{background-position:0 0}100%{background-position:52px 52px}}
+#screen-login::after{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:800px;height:600px;
+  background:radial-gradient(ellipse,rgba(79,142,247,.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+
+.login-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:36px}
+
+.login-brand{text-align:center}
+.login-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.login-title{
+  font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1;
+  background:linear-gradient(135deg,var(--text) 0%,var(--muted) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.login-title em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--blue),#818cf8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.login-sub{margin-top:10px;font-size:14px;color:var(--muted)}
+
+.login-card{
+  background:rgba(20,24,36,.9);
+  border:1px solid var(--b1);
+  border-radius:20px;
+  padding:40px 44px;
+  width:400px;
+  backdrop-filter:blur(24px);
+  box-shadow:0 0 0 1px rgba(255,255,255,.03),0 32px 64px rgba(0,0,0,.55);
+}
+.login-card-title{font-size:14px;font-weight:700;color:var(--t2);margin-bottom:4px}
+.login-card-sub{font-size:12px;color:var(--muted);margin-bottom:28px}
+
+.input-group{position:relative;margin-bottom:14px}
+.input-group input{
+  width:100%;padding:13px 44px 13px 16px;
+  background:rgba(0,0,0,.4);
+  border:1px solid var(--b1);
+  border-radius:10px;
+  color:var(--text);font-size:15px;
+  letter-spacing:2px;font-family:monospace;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.input-group input::placeholder{letter-spacing:.5px;font-size:13px;font-family:'Segoe UI',sans-serif;color:var(--dim)}
+.input-group input:focus{border-color:rgba(79,142,247,.6);box-shadow:0 0 0 3px rgba(79,142,247,.08)}
+.eye-btn{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--dim);font-size:15px;padding:4px;
+  transition:color .2s;
+}
+.eye-btn:hover{color:var(--blue)}
+
+.login-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#2563eb,#4F8EF7,#60a5fa);
+  border:none;border-radius:10px;color:#fff;
+  font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(79,142,247,.3);
+  transition:all .2s;
+}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(79,142,247,.4)}
+
+.login-err{
+  margin-top:12px;padding:10px 14px;
+  background:var(--red-d);border:1px solid var(--red-b);
+  border-radius:8px;color:#fca5a5;font-size:12px;font-weight:600;
+  display:none;animation:shake .4s ease;
+}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.login-err.show{display:block}
+.login-footer{font-size:11px;color:var(--dim)}
+
+/* ── PORTAL ── */
+#screen-portal{display:none}
+
+.portal-header{
+  background:linear-gradient(135deg,var(--s1),var(--s2));
+  border-bottom:1px solid var(--b1);
+  padding:0 40px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px rgba(0,0,0,.4);
+}
+.ph-brand{display:flex;align-items:center;gap:12px}
+.ph-dot{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,#2563eb,#4F8EF7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;color:#fff;
+  box-shadow:0 4px 12px rgba(79,142,247,.35);
+}
+.ph-name{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.ph-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.ph-right{display:flex;align-items:center;gap:10px}
+.ph-chip{background:var(--s3);border:1px solid var(--b1);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;color:var(--muted)}
+.logout-btn{
+  background:none;border:1px solid var(--b1);padding:6px 14px;border-radius:8px;
+  color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.logout-btn:hover{border-color:var(--red-b);color:var(--red);background:var(--red-d)}
+
+/* HERO */
+.portal-hero{
+  background:linear-gradient(160deg,var(--s1) 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--b1);
+  padding:52px 40px 40px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.portal-hero::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:900px;height:350px;
+  background:radial-gradient(ellipse,rgba(79,142,247,.06) 0%,transparent 65%);
+  pointer-events:none;
+}
+.portal-hero h1{font-size:34px;font-weight:900;letter-spacing:-1px;margin-bottom:10px;color:var(--text)}
+.portal-hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--blue),#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.portal-hero p{font-size:14px;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.7}
+
+.portal-stats{display:flex;align-items:center;justify-content:center;gap:40px;margin-top:32px}
+.ps-item{text-align:center}
+.ps-val{font-size:26px;font-weight:900;color:var(--text);letter-spacing:-.5px}
+.ps-lbl{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.ps-div{width:1px;height:40px;background:var(--b1)}
+
+/* CONTENT */
+.portal-content{max-width:1300px;margin:0 auto;padding:48px 40px 80px}
+.sec-lbl{
+  font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.5px;
+  margin-bottom:22px;
+  display:flex;align-items:center;gap:10px;
+}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+.companies-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px}
+
+/* COMPANY CARD */
+.company-card{
+  background:var(--s2);border:1px solid var(--b1);border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 4px 24px rgba(0,0,0,.3);
+  transition:transform .25s,box-shadow .25s,border-color .25s;
+  position:relative;
+}
+.company-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.company-card.rap:hover{border-color:rgba(20,184,166,.35)}
+.company-card.mgf:hover{border-color:rgba(79,142,247,.35)}
+.company-card.rap::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--purple))}
+.company-card.mgf::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),#818cf8)}
+
+.cc-header{padding:28px 28px 20px}
+.cc-brand{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.cc-logo{
+  width:50px;height:50px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;flex-shrink:0;
+}
+.cc-logo.rap{background:linear-gradient(135deg,var(--teal-d),var(--pur-d));border:1px solid var(--teal-b);color:var(--teal)}
+.cc-logo.mgf{background:linear-gradient(135deg,var(--blue-d),rgba(129,140,248,.15));border:1px solid var(--blue-b);color:var(--blue)}
+.cc-name{font-size:20px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
+.cc-sector{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* KPI row */
+.cc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+.cc-kpi{background:var(--s3);border:1px solid var(--b1);border-radius:10px;padding:14px;position:relative}
+.cc-kpi-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.cc-kpi-val{font-size:18px;font-weight:800;line-height:1;letter-spacing:-.3px;color:var(--text)}
+.cc-kpi-sub{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* YTD tooltip */
+.ytd-tip{position:relative;cursor:help;display:inline-flex;align-items:center;gap:4px}
+.ytd-tip::after{
+  content:attr(data-tip);
+  position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);
+  background:var(--s1);border:1px solid var(--b2);
+  color:var(--t2);padding:9px 13px;border-radius:9px;
+  font-size:11px;font-weight:500;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+  z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  line-height:1.5;
+}
+.ytd-tip:hover::after{opacity:1}
+.ytd-tip .help-icon{font-size:10px;color:var(--dim);opacity:.7}
+
+/* Month rows */
+.cc-body{padding:0 28px}
+.months-title{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.month-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(36,44,66,.5)}
+.month-row:last-child{border-bottom:none}
+.mr-month{font-size:12px;font-weight:700;color:var(--t2);min-width:32px}
+.mr-bar-wrap{flex:1;height:5px;background:var(--s4);border-radius:3px;overflow:hidden}
+.mr-bar{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.mr-val{font-size:12px;font-weight:700;min-width:68px;text-align:right;color:var(--text)}
+.mr-pct{font-size:10px;font-weight:800;min-width:44px;text-align:right;border-radius:5px;padding:2px 6px}
+.pct-g{color:var(--green);background:var(--green-d)}
+.pct-y{color:var(--yellow);background:var(--yel-d)}
+.pct-r{color:var(--red);background:var(--red-d)}
+.pct-n{color:var(--dim);background:var(--s3);font-style:italic}
+
+/* Sparkline */
+.cc-chart{padding:18px 28px 6px}
+.cc-chart-title{font-size:10px;font-weight:700;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.8px}
+.chart-container{position:relative;height:88px}
+
+/* Footer/CTA */
+.cc-footer{padding:18px 28px 26px;display:flex;align-items:center;justify-content:space-between}
+.cc-period{font-size:11px;color:var(--dim);line-height:1.6}
+.cc-period strong{color:var(--t2);font-weight:700}
+
+.cta-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:11px 22px;border:none;border-radius:10px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;letter-spacing:.2px;
+}
+.cta-btn.rap{background:linear-gradient(135deg,rgba(20,184,166,.18),rgba(168,85,247,.18));border:1px solid rgba(20,184,166,.4);color:var(--teal)}
+.cta-btn.rap:hover{background:linear-gradient(135deg,rgba(20,184,166,.32),rgba(168,85,247,.32));transform:translateX(3px)}
+.cta-btn.mgf{background:linear-gradient(135deg,rgba(79,142,247,.18),rgba(129,140,248,.18));border:1px solid rgba(79,142,247,.4);color:var(--blue)}
+.cta-btn.mgf:hover{background:linear-gradient(135deg,rgba(79,142,247,.32),rgba(129,140,248,.32));transform:translateX(3px)}
+
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:48px}
+.sum-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:20px;transition:border-color .2s,transform .2s}
+.sum-card:hover{transform:translateY(-2px);border-color:var(--b2)}
+.sum-icon{font-size:22px;margin-bottom:12px}
+.sum-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.sum-value{font-size:22px;font-weight:900;letter-spacing:-.4px;margin-bottom:4px;color:var(--text)}
+.sum-sub{font-size:12px;color:var(--muted)}
+
+/* FOOTER */
+.portal-foot{border-top:1px solid var(--b1);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--dim)}
+
+/* TAGS */
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.tag-up{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.tag-dn{background:var(--red-d);color:var(--red);border:1px solid var(--red-b)}
+.tag-yw{background:var(--yel-d);color:var(--yellow);border:1px solid var(--yel-b)}
+
+/* ── DASHBOARD OVERLAY ── */
+#dash-overlay{
+  display:none;
+  position:fixed;inset:0;z-index:500;
+  flex-direction:column;
+  background:var(--bg);
+}
+.dash-topbar{
+  height:52px;
+  background:var(--s1);
+  border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+  flex-shrink:0;
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+.dash-back-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--s3);border:1px solid var(--b1);
+  padding:7px 16px;border-radius:8px;
+  color:var(--t2);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.3px;
+}
+.dash-back-btn:hover{background:var(--b1);color:var(--text);border-color:var(--b2)}
+.dash-title{font-size:13px;font-weight:700;color:var(--muted)}
+.dash-badge{background:var(--blue-d);border:1px solid var(--blue-b);color:var(--blue);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600}
+#dash-frame{flex:1;border:none;width:100%;display:block}
+
+@media(max-width:900px){
+  .companies-grid{grid-template-columns:1fr}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .portal-stats{gap:20px}
+  .cc-kpis{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ LOGIN ════════ -->
+<div id="screen-login">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-eyebrow">Portal Executivo · Acesso restrito</div>
+      <div class="login-title">Portal <em>Executivo</em></div>
+      <div class="login-sub">Dashboard Integrado de Performance · Exercício 2026</div>
+    </div>
+    <div class="login-card">
+      <div class="login-card-title">🔒 Autenticação</div>
+      <div class="login-card-sub">Digite a senha para acessar os dashboards</div>
+      <div class="input-group">
+        <input type="password" id="pw-input" placeholder="Senha de acesso"
+          autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="eye-btn" onclick="toggleEye()">👁</button>
+      </div>
+      <button class="login-btn" onclick="doLogin()">Entrar no Portal</button>
+      <div class="login-err" id="login-err">❌ Senha incorreta. Tente novamente.</div>
+    </div>
+    <div class="login-footer">Uso interno e confidencial · 2026</div>
+  </div>
+</div>
+
+<!-- ════════ DASHBOARD OVERLAY ════════ -->
+<div id="dash-overlay">
+  <div class="dash-topbar">
+    <button class="dash-back-btn" onclick="closeDash()">← Voltar ao Portal</button>
+    <div class="dash-title" id="dash-title"></div>
+    <div class="dash-badge">Dashboard Executivo · 2026</div>
+  </div>
+  <iframe id="dash-frame" src=""></iframe>
+</div>
+
+<!-- ════════ PORTAL PRINCIPAL ════════ -->
+<div id="screen-portal">
+
+  <div class="portal-header">
+    <div class="ph-brand">
+      <div class="ph-dot">P</div>
+      <div>
+        <div class="ph-name">Portal Executivo</div>
+        <div class="ph-sub">Performance Integrada · 2026</div>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-chip">📅 Jan – Mai 2026</div>
+      <div class="ph-chip">2 Dashboards</div>
+      <button class="logout-btn" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="portal-hero">
+    <h1>Selecione o <em>Dashboard</em></h1>
+    <p>Escolha a empresa para visualizar o fechamento executivo completo — faturamento, metas, divisões, análise de IA e insights estratégicos.</p>
+    <div class="portal-stats">
+      <div class="ps-item"><div class="ps-val">2</div><div class="ps-lbl">Empresas</div></div>
+      <div class="ps-div"></div>
+      <div class="ps-item"><div class="ps-val">R$ 80,8M</div><div class="ps-lbl">Faturamento Total YTD</div></div>
+      <div class="ps-div"></div>
+      <div class="ps-item"><div class="ps-val">Jan – Mai</div><div class="ps-lbl">Período coberto</div></div>
+      <div class="ps-div"></div>
+      <div class="ps-item"><div class="ps-val">+4,3%</div><div class="ps-lbl">Crescimento vs 2025</div></div>
+    </div>
+  </div>
+
+  <div class="portal-content">
+    <div class="sec-lbl">Dashboards disponíveis</div>
+
+    <div class="companies-grid">
+
+      <!-- RAP CARD -->
+      <div class="company-card rap">
+        <div class="cc-header">
+          <div class="cc-brand">
+            <div class="cc-logo rap">RAP</div>
+            <div>
+              <div class="cc-name">RAP — Rei Auto Parts</div>
+              <div class="cc-sector">Autopeças · Distribuição · Fundição de Ferro &amp; Alumínio</div>
+            </div>
+          </div>
+          <div class="cc-kpis">
+            <div class="cc-kpi">
+              <div class="cc-kpi-lbl ytd-tip" data-tip="Year to Date — Acumulado&#10;do início do ano até Mai/26">
+                YTD Realizado <span class="help-icon">?</span>
+              </div>
+              <div class="cc-kpi-val" style="color:var(--teal)">R$ 65,6M</div>
+              <div class="cc-kpi-sub">Jan – Mai 2026</div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-lbl">Último Mês</div>
+              <div class="cc-kpi-val" style="color:var(--red)">R$ 14,2M</div>
+              <div class="cc-kpi-sub"><span class="tag tag-dn">91,7% meta</span></div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-lbl ytd-tip" data-tip="Crescimento YTD vs mesmo&#10;período do ano anterior (2025)">
+                vs 2025 <span class="help-icon">?</span>
+              </div>
+              <div class="cc-kpi-val" style="color:var(--green)">+4,3%</div>
+              <div class="cc-kpi-sub">Crescimento real</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc-body">
+          <div class="months-title">Faturamento mensal — 2026</div>
+          <div id="rap-months"></div>
+        </div>
+
+        <div class="cc-chart">
+          <div class="cc-chart-title">Evolução do faturamento</div>
+          <div class="chart-container"><canvas id="chart-rap"></canvas></div>
+        </div>
+
+        <div class="cc-footer">
+          <div class="cc-period">
+            <strong>5 meses</strong> de dados<br>
+            <span>Jan · Fev · Mar · Abr · Mai / 2026</span>
+          </div>
+          <button class="cta-btn rap" onclick="openDash('dashboard-rap.html','RAP — Rei Auto Parts')">
+            Acessar Dashboard →
+          </button>
+        </div>
+      </div>
+
+      <!-- MG FREIOS CARD -->
+      <div class="company-card mgf">
+        <div class="cc-header">
+          <div class="cc-brand">
+            <div class="cc-logo mgf">MG</div>
+            <div>
+              <div class="cc-name">MG Freios + DMMG</div>
+              <div class="cc-sector">Autopeças · Freios · Componentes Agrícolas &amp; Industriais</div>
+            </div>
+          </div>
+          <div class="cc-kpis">
+            <div class="cc-kpi">
+              <div class="cc-kpi-lbl ytd-tip" data-tip="Year to Date — Acumulado&#10;do início do ano até Mai/26">
+                YTD Realizado <span class="help-icon">?</span>
+              </div>
+              <div class="cc-kpi-val" style="color:var(--blue)">R$ 15,2M</div>
+              <div class="cc-kpi-sub">Jan – Mai 2026</div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-lbl">Último Mês</div>
+              <div class="cc-kpi-val" style="color:var(--yellow)">R$ 2,9M</div>
+              <div class="cc-kpi-sub"><span class="tag tag-yw">89% meta</span></div>
+            </div>
+            <div class="cc-kpi">
+              <div class="cc-kpi-lbl ytd-tip" data-tip="Crescimento YTD consolidado&#10;(MG Freios + DMMG) vs 2025">
+                vs 2025 <span class="help-icon">?</span>
+              </div>
+              <div class="cc-kpi-val" style="color:var(--green)">+7,2%</div>
+              <div class="cc-kpi-sub">Consolidado</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc-body">
+          <div class="months-title">Faturamento mensal — 2026</div>
+          <div id="mgf-months"></div>
+        </div>
+
+        <div class="cc-chart">
+          <div class="cc-chart-title">Evolução do faturamento</div>
+          <div class="chart-container"><canvas id="chart-mgf"></canvas></div>
+        </div>
+
+        <div class="cc-footer">
+          <div class="cc-period">
+            <strong>5 meses</strong> de dados<br>
+            <span>Jan · Fev · Mar · Abr · Mai / 2026</span>
+          </div>
+          <button class="cta-btn mgf" onclick="openDash('mgf-dashboard.html','MG Freios + DMMG')">
+            Acessar Dashboard →
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /companies-grid -->
+
+    <div class="sec-lbl">Resumo consolidado</div>
+    <div class="summary-grid">
+      <div class="sum-card">
+        <div class="sum-icon">🏭</div>
+        <div class="sum-label">Melhor Mês RAP</div>
+        <div class="sum-value" style="color:var(--teal)">R$ 16,0M</div>
+        <div class="sum-sub">Março 2026 · 98,7% da meta</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🏆</div>
+        <div class="sum-label">Melhor Mês MG Freios</div>
+        <div class="sum-value" style="color:var(--blue)">R$ 3,7M</div>
+        <div class="sum-sub">Março 2026 · Pico do semestre</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">⚠️</div>
+        <div class="sum-label">Alerta RAP</div>
+        <div class="sum-value" style="color:var(--red)">91,7%</div>
+        <div class="sum-sub">Meta Maio — menor do período</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">📉</div>
+        <div class="sum-label">Alerta MG Freios</div>
+        <div class="sum-value" style="color:var(--red)">−5,1%</div>
+        <div class="sum-sub" class="ytd-tip" data-tip="YTD = acumulado do ano">MG Freios YTD vs 2025</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">📈</div>
+        <div class="sum-label">Crescimento RAP</div>
+        <div class="sum-value" style="color:var(--green)">+4,3%</div>
+        <div class="sum-sub">YTD vs 2025</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🚀</div>
+        <div class="sum-label">Destaque DMMG</div>
+        <div class="sum-value" style="color:var(--green)">+41%</div>
+        <div class="sum-sub">YTD vs 2025 · 111% da meta anual</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">💡</div>
+        <div class="sum-label">Oportunidade RAP</div>
+        <div class="sum-value" style="color:var(--teal)">+18%</div>
+        <div class="sum-sub">Injeção Alumínio em expansão</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🏦</div>
+        <div class="sum-label">Caixa MG Freios</div>
+        <div class="sum-value" style="color:var(--green)">R$ 1,1M</div>
+        <div class="sum-sub">Melhor posição do ano</div>
+      </div>
+    </div>
+
+  </div><!-- /portal-content -->
+
+  <div class="portal-foot">
+    <span>Portal Executivo · RAP + MG Freios + DMMG · Janeiro – Maio 2026 · Uso interno e confidencial</span>
+    <span id="portal-time"></span>
+  </div>
+</div>
+
+<script>
+// ── LOGIN ──
+function doLogin(){
+  if(document.getElementById('pw-input').value==='dado@2026'){
+    document.getElementById('screen-login').style.display='none';
+    document.getElementById('screen-portal').style.display='block';
+    initPortal();
+  } else {
+    const e=document.getElementById('login-err');
+    e.classList.add('show');
+    e.style.animation='none'; void e.offsetWidth; e.style.animation='';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+function doLogout(){
+  closeDash();
+  document.getElementById('screen-portal').style.display='none';
+  document.getElementById('screen-login').style.display='flex';
+  document.getElementById('pw-input').value='';
+  document.getElementById('login-err').classList.remove('show');
+}
+function toggleEye(){
+  const i=document.getElementById('pw-input');
+  i.type=i.type==='password'?'text':'password';
+}
+document.addEventListener('DOMContentLoaded',()=>document.getElementById('pw-input').focus());
+
+// ── DASHBOARD OVERLAY ──
+function openDash(src, title){
+  document.getElementById('dash-title').textContent=title;
+  document.getElementById('dash-frame').src=src;
+  document.getElementById('dash-overlay').style.display='flex';
+  document.getElementById('screen-portal').style.display='none';
+}
+function closeDash(){
+  document.getElementById('dash-overlay').style.display='none';
+  document.getElementById('screen-portal').style.display='block';
+  document.getElementById('dash-frame').src='';
+}
+
+// ── DATA ──
+const RAP=[
+  {m:'Jan',fat:7314367, orc:6907368, pct:105.9},
+  {m:'Fev',fat:13483652,orc:14168068,pct:95.2},
+  {m:'Mar',fat:15949832,orc:16159976,pct:98.7},
+  {m:'Abr',fat:14617444,orc:14517808,pct:100.7},
+  {m:'Mai',fat:14201019,orc:15493125,pct:91.7},
+];
+const MGF=[
+  {m:'Jan',fat:2303413, orc:null,    pct:null},
+  {m:'Fev',fat:3048638, orc:null,    pct:null},
+  {m:'Mar',fat:3692217, orc:4196250, pct:88},
+  {m:'Abr',fat:3255036, orc:4580000, pct:90},
+  {m:'Mai',fat:2910311, orc:4581250, pct:89},
+];
+
+function fmtM(v){
+  if(v>=1e6) return'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M';
+  if(v>=1e3) return'R$ '+(v/1e3).toFixed(0)+'K';
+  return'R$ '+v.toLocaleString('pt-BR');
+}
+function pctCls(p){return p===null?'pct-n':p>=100?'pct-g':p>=95?'pct-y':'pct-r'}
+function pctLbl(p){return p===null?'hist.':p.toFixed(1)+'%'}
+
+function buildMonths(id, data){
+  const maxV=Math.max(...data.map(d=>d.fat));
+  document.getElementById(id).innerHTML=data.map(d=>{
+    const w=(d.fat/maxV*100).toFixed(1);
+    const barClr=d.pct===null?'var(--dim)':d.pct>=100?'var(--green)':d.pct>=95?'var(--yellow)':'var(--red)';
+    return`<div class="month-row">
+      <div class="mr-month">${d.m}</div>
+      <div class="mr-bar-wrap"><div class="mr-bar" style="width:${w}%;background:${barClr}"></div></div>
+      <div class="mr-val">${fmtM(d.fat)}</div>
+      <div class="mr-pct ${pctCls(d.pct)}">${pctLbl(d.pct)}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildChart(id, data, color){
+  const ctx=document.getElementById(id);
+  if(!ctx) return;
+  new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:data.map(d=>d.m),
+      datasets:[{
+        data:data.map(d=>d.fat),
+        borderColor:color,
+        backgroundColor:color.replace(/[\d.]+\)$/,'0.1)'),
+        fill:true,tension:.4,
+        pointRadius:3,
+        pointBackgroundColor:data.map(d=>
+          d.pct===null?'var(--dim)':d.pct>=100?'#22C55E':d.pct>=95?'#F59E0B':'#EF4444'
+        ),
+        borderWidth:2,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{
+        callbacks:{label:c=>' '+fmtM(c.raw),title:c=>c[0].label+'/26'},
+        backgroundColor:'rgba(14,17,24,.95)',
+        borderColor:'rgba(255,255,255,.08)',borderWidth:1,
+        titleColor:'#F0F4FF',bodyColor:'#8E9BBF',padding:10
+      }},
+      scales:{
+        x:{grid:{color:'rgba(36,44,66,.6)'},ticks:{color:'#5A6888',font:{size:10}}},
+        y:{grid:{color:'rgba(36,44,66,.6)'},ticks:{color:'#5A6888',font:{size:10},callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v}}
+      }
+    }
+  });
+}
+
+function initPortal(){
+  buildMonths('rap-months',RAP);
+  buildMonths('mgf-months',MGF);
+  buildChart('chart-rap',RAP,'#14B8A6');
+  buildChart('chart-mgf',MGF,'#4F8EF7');
+  // timestamp
+  const d=new Date();
+  document.getElementById('portal-time').textContent=
+    'Atualizado: '+d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+</script>
+</body>
+</html>

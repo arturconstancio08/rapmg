@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Executivo 2026 | MG Freios + DMMG</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#07090F; --s1:#0E1118; --s2:#141824; --s3:#1B2030;
+  --b1:#242C42; --b2:#2E3855;
+  --text:#F0F4FF; --t2:#C8D0E8; --muted:#8E9BBF; --dim:#5A6888;
+  --blue:#4F8EF7; --blue-d:rgba(79,142,247,.12); --blue-b:rgba(79,142,247,.25);
+  --green:#22C55E; --green-d:rgba(34,197,94,.1); --green-b:rgba(34,197,94,.22);
+  --red:#EF4444; --red-d:rgba(239,68,68,.1); --red-b:rgba(239,68,68,.22);
+  --yellow:#F59E0B; --yel-d:rgba(245,158,11,.1); --yel-b:rgba(245,158,11,.22);
+  --teal:#14B8A6; --teal-d:rgba(20,184,166,.1); --teal-b:rgba(20,184,166,.22);
+  --purple:#A855F7; --pur-d:rgba(168,85,247,.1); --pur-b:rgba(168,85,247,.22);
+  --mg:#22C55E; --dmmg:#14B8A6;
+  --r:12px; --r-sm:8px;
+  --sh:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--s1)}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+
+/* ── LOGIN ───────────────────────────────────── */
+#login-screen{display:none!important}
+#login-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 120% 60% at 50% 110%,rgba(0,180,100,.18) 0%,transparent 65%),linear-gradient(180deg,#050a05 0%,#0a1a0e 45%,#0d2010 70%,#050a05 100%)}
+#login-screen::after{content:'';position:absolute;bottom:0;left:0;right:0;height:48%;background-image:repeating-linear-gradient(60deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(-60deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 28px);transform:perspective(600px) rotateX(55deg);transform-origin:bottom center}
+.l-glow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:140%;height:2px;background:linear-gradient(90deg,transparent,rgba(0,220,100,.55),rgba(255,255,255,.85),rgba(0,220,100,.55),transparent);box-shadow:0 0 40px 10px rgba(0,200,100,.35),0 0 80px 24px rgba(0,160,70,.12);animation:gp 3s ease-in-out infinite}
+@keyframes gp{0%,100%{opacity:.75}50%{opacity:1}}
+.l-card{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center}
+.l-logo{text-align:center;margin-bottom:34px;user-select:none}
+.l-logo-text{font-size:66px;font-weight:900;letter-spacing:-1px;line-height:1;background:linear-gradient(135deg,#00e06a,#00c058 40%,#00ff7a 70%,#00c058);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 22px rgba(0,220,100,.5));font-family:'Segoe UI Black','Arial Black',sans-serif}
+.l-logo-text em{background:linear-gradient(135deg,#fff,#d0ffdf);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:normal}
+.l-disc{display:inline-block;width:52px;height:52px;vertical-align:middle;margin:0 1px;border-radius:50%;background:conic-gradient(from 0deg,#00c058 0deg 270deg,transparent 270deg 360deg);box-shadow:0 0 14px rgba(0,200,80,.55);position:relative;top:-3px}
+.l-disc::after{content:'';position:absolute;inset:10px;border-radius:50%;background:#050805}
+.l-line{display:block;width:100%;height:3px;margin-top:7px;background:linear-gradient(90deg,transparent,#00e06a,#fff,#ffe000,#fff,#00e06a,transparent);border-radius:2px;box-shadow:0 0 10px rgba(0,220,100,.35)}
+.l-sub{font-size:11px;color:rgba(0,200,80,.6);font-weight:700;letter-spacing:3px;margin-top:6px}
+.l-box{background:rgba(6,14,8,.9);border:1px solid rgba(0,200,80,.18);border-radius:16px;padding:30px 38px;width:330px;backdrop-filter:blur(24px);box-shadow:0 0 50px rgba(0,180,80,.09),0 20px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(0,220,100,.07);text-align:center}
+.l-ttl{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,200,80,.6);margin-bottom:5px}
+.l-st{font-size:11px;color:rgba(255,255,255,.25);margin-bottom:20px}
+.pw-w{position:relative;margin-bottom:11px}
+.pw-w input{width:100%;padding:12px 42px 12px 16px;background:rgba(0,0,0,.4);border:1px solid rgba(0,170,65,.25);border-radius:9px;color:#fff;font-size:15px;letter-spacing:3px;outline:none;transition:border-color .2s,box-shadow .2s;font-family:monospace}
+.pw-w input:focus{border-color:rgba(0,220,100,.6);box-shadow:0 0 0 3px rgba(0,200,80,.09)}
+.pw-w input::placeholder{letter-spacing:1px;font-size:12px;color:rgba(255,255,255,.2);font-family:'Segoe UI',sans-serif}
+.pw-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);cursor:pointer;color:rgba(255,255,255,.25);font-size:14px;user-select:none;transition:color .2s}
+.pw-eye:hover{color:rgba(0,220,100,.65)}
+.l-btn{width:100%;padding:12px;background:linear-gradient(135deg,#00a848,#00c055,#00d864);border:none;border-radius:9px;color:#000;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 18px rgba(0,200,80,.25);transition:all .2s;font-family:'Segoe UI',sans-serif}
+.l-btn:hover{transform:translateY(-1px);box-shadow:0 7px 24px rgba(0,200,80,.38)}
+.l-err{margin-top:11px;padding:8px 14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:#fca5a5;font-size:12px;font-weight:600;display:none;animation:shk .4s ease}
+.l-err.show{display:block}
+@keyframes shk{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.fade-out{animation:fo .55s ease forwards}
+@keyframes fo{to{opacity:0;pointer-events:none}}
+#app{display:block}
+
+/* ── HEADER ──────────────────────────────────── */
+.hdr{background:linear-gradient(135deg,var(--s1),var(--s2));border-bottom:1px solid var(--b1);padding:15px 36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.35)}
+.hdr-brand{display:flex;align-items:center;gap:16px}
+.hdr-logo{font-size:20px;font-weight:900;color:var(--mg);font-family:'Segoe UI Black','Arial Black',sans-serif;letter-spacing:-.3px}
+.hdr-sep{width:1px;height:26px;background:var(--b2)}
+.hdr-name{font-size:15px;font-weight:700;color:var(--text)}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.chip{background:var(--s3);border:1px solid var(--b1);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.chip.ok{background:var(--green-d);border-color:var(--green-b);color:var(--green)}
+.chip.warn{background:var(--yel-d);border-color:var(--yel-b);color:var(--yellow)}
+
+/* ── TABS ────────────────────────────────────── */
+.tabs{background:var(--s1);border-bottom:1px solid var(--b1);padding:0 36px;display:flex;position:sticky;top:61px;z-index:99}
+.tab{padding:13px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .16s;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--t2);background:rgba(255,255,255,.03)}
+.tab.active{color:var(--text);border-bottom-color:var(--blue)}
+.tab.tm.active{border-bottom-color:var(--purple);color:var(--purple)}
+.tab.ta.active{border-bottom-color:var(--teal);color:var(--teal)}
+.tab.tmi.active{border-bottom-color:var(--blue);color:var(--blue)}
+.tab.tc.active{border-bottom-color:var(--yellow);color:var(--yellow)}
+
+/* ── PAGE ────────────────────────────────────── */
+.page{display:none;padding:28px 36px 60px;max-width:1480px;margin:0 auto}
+.page.active{display:block}
+
+/* ── SECTION TITLE ───────────────────────────── */
+.sec{display:flex;align-items:center;gap:10px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase;margin:32px 0 14px}
+.sec:first-child{margin-top:0}
+.sec::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* ── GRIDS ───────────────────────────────────── */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.mt{margin-top:14px}
+
+/* ── KPI ─────────────────────────────────────── */
+.kpi{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px 20px 16px;box-shadow:var(--sh);transition:border-color .18s,transform .18s;position:relative;overflow:hidden}
+.kpi:hover{border-color:var(--b2);transform:translateY(-1px)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
+.kpi.cg::before{background:var(--green)} .kpi.cr::before{background:var(--red)}
+.kpi.cb::before{background:var(--blue)}  .kpi.ct::before{background:var(--teal)}
+.kpi.cy::before{background:var(--yellow)}.kpi.cp::before{background:var(--purple)}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.kpi-ic{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.kpi.cg .kpi-ic{background:var(--green-d)} .kpi.cr .kpi-ic{background:var(--red-d)}
+.kpi.cb .kpi-ic{background:var(--blue-d)}  .kpi.ct .kpi-ic{background:var(--teal-d)}
+.kpi.cy .kpi-ic{background:var(--yel-d)}   .kpi.cp .kpi-ic{background:var(--pur-d)}
+.kpi-lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.kpi-val{font-size:24px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-.4px}
+.kpi-val.sm{font-size:19px}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.kpi-nd{font-size:13px;font-weight:700;color:var(--muted)}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:8px}
+.d-up{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.d-dn{background:var(--red-d);color:var(--red);border:1px solid var(--red-b)}
+.d-wn{background:var(--yel-d);color:var(--yellow);border:1px solid var(--yel-b)}
+.d-nt{background:var(--s3);color:var(--muted);border:1px solid var(--b1)}
+.d-nd{background:var(--s3);color:var(--dim);border:1px solid var(--b1)}
+
+/* ── CARD ────────────────────────────────────── */
+.cc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh)}
+.cc h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.cc .csub{font-size:12px;color:var(--t2);margin-bottom:16px}
+
+/* ── ALERT ───────────────────────────────────── */
+.alert{border-radius:var(--r-sm);padding:13px 16px;margin-bottom:22px;display:flex;gap:11px;align-items:flex-start}
+.al-g{background:var(--green-d);border:1px solid var(--green-b)}
+.al-r{background:var(--red-d);border:1px solid var(--red-b)}
+.al-y{background:var(--yel-d);border:1px solid var(--yel-b)}
+.al-b{background:var(--blue-d);border:1px solid var(--blue-b)}
+.alert .ai{font-size:17px;flex-shrink:0;margin-top:1px}
+.alert p{font-size:13px;color:var(--text);line-height:1.65}
+.alert p strong{color:#fff;font-weight:700}
+
+/* ── PERIOD TAG ──────────────────────────────── */
+.ptag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:20px}
+.ptag-m{background:var(--pur-d);color:var(--purple);border:1px solid var(--pur-b)}
+.ptag-a{background:var(--teal-d);color:var(--teal);border:1px solid var(--teal-b)}
+.ptag-mi{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)}
+
+/* ── META BARS ───────────────────────────────── */
+.mb{margin-bottom:13px}
+.mb:last-child{margin-bottom:0}
+.mb label{font-size:12px;color:var(--t2);display:flex;justify-content:space-between;margin-bottom:5px;font-weight:500}
+.mb label strong{color:var(--text);font-weight:700}
+.mb-track{background:var(--s3);border:1px solid var(--b1);border-radius:5px;height:7px;overflow:hidden}
+.mb-fill{height:100%;border-radius:5px}
+.mf-g{background:var(--green)} .mf-r{background:var(--red)}
+.mf-y{background:var(--yellow)}.mf-t{background:var(--teal)}
+
+/* ── COMPANY STATS ───────────────────────────── */
+.co{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh)}
+.co.mg{border-top:2px solid var(--mg)}
+.co.dm{border-top:2px solid var(--teal)}
+.co h3{font-size:14px;font-weight:800;margin-bottom:13px}
+.co.mg h3{color:var(--mg)} .co.dm h3{color:var(--teal)}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--b1)}
+.sr:last-child{border-bottom:none}
+.sl{font-size:12px;color:var(--t2)} .sv{font-size:13px;font-weight:700;color:var(--text)}
+
+/* ── TABLE ───────────────────────────────────── */
+.rt{width:100%;border-collapse:collapse}
+.rt th{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;padding:0 8px 9px;text-align:left;border-bottom:1px solid var(--b2)}
+.rt td{padding:8px 8px;font-size:11px;border-bottom:1px solid rgba(30,36,56,.6);vertical-align:middle}
+.rt tr:last-child td{border-bottom:none}
+.rt tr:hover td{background:rgba(255,255,255,.02)}
+.rn{color:var(--dim);font-size:10px;font-weight:700;width:18px}
+.bw{display:flex;align-items:center;gap:6px}
+.b{height:4px;border-radius:2px;min-width:2px}
+
+/* ── CASH LIST ───────────────────────────────── */
+.cash{display:flex;flex-direction:column;gap:7px}
+.ci{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r-sm)}
+.ci .cl{font-size:11px;color:var(--muted)} .ci .cv{font-size:12px;font-weight:700}
+.ci.hi{background:var(--blue-d);border-color:var(--blue-b)} .ci.hi .cl,.ci.hi .cv{color:var(--blue)}
+.ci.hg{background:var(--green-d);border-color:var(--green-b)} .ci.hg .cl,.ci.hg .cv{color:var(--green)}
+
+/* ── N/D BOX ─────────────────────────────────── */
+.nd-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;gap:8px;color:var(--dim);border:1px dashed var(--b1);border-radius:var(--r-sm)}
+.nd-box span{font-size:24px} .nd-box p{font-size:12px;color:var(--dim)}
+
+/* ── DONUT ───────────────────────────────────── */
+.dw{position:relative}
+.dc{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);text-align:center;pointer-events:none}
+.dc .dv{font-size:20px;font-weight:800} .dc .dl{font-size:10px;color:var(--muted)}
+
+/* ── INSIGHT ─────────────────────────────────── */
+.ic{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.ic .ih{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.ic .ii{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ic .it{font-size:13px;font-weight:700;color:var(--text)}
+.ic .ib{font-size:12px;color:var(--t2);line-height:1.7}
+.ic .ib strong{color:#fff;font-weight:700}
+.ic-r .ii{background:var(--red-d);border:1px solid var(--red-b)}
+.ic-g .ii{background:var(--green-d);border:1px solid var(--green-b)}
+.ic-y .ii{background:var(--yel-d);border:1px solid var(--yel-b)}
+.ic-b .ii{background:var(--blue-d);border:1px solid var(--blue-b)}
+.ic-t .ii{background:var(--teal-d);border:1px solid var(--teal-b)}
+.ic-p .ii{background:var(--pur-d);border:1px solid var(--pur-b)}
+
+/* ── CMP TABLE ───────────────────────────────── */
+.cmp{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.crow{display:grid;grid-template-columns:2.1fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--b1)}
+.crow:last-child{border-bottom:none}
+.crow.ch{background:var(--s3)}
+.crow:not(.ch):hover{background:rgba(255,255,255,.018)}
+.crow.alt:not(.ch){background:rgba(255,255,255,.012)}
+.ch .cd{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;text-align:right}
+.ch .cd:first-child{text-align:left}
+.cd{padding:10px 14px;font-size:12px;font-weight:600;color:var(--text);text-align:right;vertical-align:middle}
+.cd:first-child{text-align:left;color:var(--muted);font-weight:500}
+.arr{font-size:11px;font-weight:800}
+.arr.up{color:var(--green)} .arr.dn{color:var(--red)} .arr.eq{color:var(--dim)}
+
+/* ── REC ─────────────────────────────────────── */
+.rc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:16px 18px;display:flex;gap:13px;box-shadow:var(--sh)}
+.rc-n{font-size:28px;font-weight:900;color:var(--b2);flex-shrink:0;line-height:1.1}
+.rc-t{font-size:13px;font-weight:700;margin-bottom:5px}
+.rc-b{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── AI SECTION ──────────────────────────────── */
+.ai-header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.ai-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(79,142,247,.15));border:1px solid rgba(168,85,247,.35);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:var(--purple);letter-spacing:.5px}
+.ai-badge::before{content:'✦';font-size:10px}
+.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ai-card{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--b1);border-radius:var(--r);padding:18px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--blue))}
+.ai-card h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ai-card h4 .tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+.tag-risk{background:var(--red-d);color:var(--red);border:1px solid var(--red-b)}
+.tag-opp{background:var(--green-d);color:var(--green);border:1px solid var(--green-b)}
+.tag-warn{background:var(--yel-d);color:var(--yellow);border:1px solid var(--yel-b)}
+.tag-pred{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b)}
+.tag-pat{background:var(--pur-d);color:var(--purple);border:1px solid var(--pur-b)}
+.tag-fin{background:var(--teal-d);color:var(--teal);border:1px solid var(--teal-b)}
+.ai-card p{font-size:12px;color:var(--t2);line-height:1.75}
+.ai-card p strong{color:#fff;font-weight:700}
+.ai-card p em{color:#C084FC;font-style:normal;font-weight:600}
+.ai-score-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r-sm)}
+.ai-score-row .score-label{font-size:11px;color:var(--muted);flex:1}
+.ai-score-val{font-size:20px;font-weight:900;line-height:1}
+.ai-score-bar{flex:2;height:6px;background:var(--b2);border-radius:4px;overflow:hidden}
+.ai-score-fill{height:100%;border-radius:4px}
+.ai-wide{grid-column:span 3;background:linear-gradient(135deg,rgba(168,85,247,.05),rgba(79,142,247,.05));border:1px solid rgba(168,85,247,.2)}
+.ai-wide::before{background:linear-gradient(90deg,var(--purple),var(--blue),var(--teal))}
+.ai-wide h4{color:var(--purple)}
+.ai-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.ai-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:var(--r-sm);border-left:2px solid}
+.ai-item.risk{border-color:var(--red)} .ai-item.opp{border-color:var(--green)}
+.ai-item.warn{border-color:var(--yellow)} .ai-item.pred{border-color:var(--blue)}
+.ai-item .ai-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+.ai-item .ai-txt{font-size:12px;color:var(--muted);line-height:1.6}
+.ai-item .ai-txt strong{color:var(--text)}
+.proj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.proj-card{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r-sm);padding:12px 14px;text-align:center}
+.proj-card .proj-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.proj-card .proj-val{font-size:18px;font-weight:800}
+.proj-card .proj-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.health-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.health-card{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r-sm);padding:10px 12px;text-align:center}
+.health-card .hl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-weight:700}
+.health-card .hv{font-size:16px;font-weight:800}
+.health-card .hs{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+/* ── FOOTER ──────────────────────────────────── */
+.footer{padding:18px 36px;border-top:1px solid var(--b1);display:flex;justify-content:space-between;color:var(--dim);font-size:11px;margin-top:36px;background:var(--s1)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="l-glow"></div>
+  <div class="l-card">
+    <div class="l-logo">
+      <div class="l-logo-text">MG<em>F</em>REI<span class="l-disc"></span>S<em>®</em></div>
+      <span class="l-line"></span>
+      <div class="l-sub">DASHBOARD EXECUTIVO · 2026</div>
+    </div>
+    <div class="l-box">
+      <div class="l-ttl">🔒 Acesso Restrito</div>
+      <div class="l-st">Área confidencial — uso interno</div>
+      <div class="pw-w">
+        <input type="password" id="pw" placeholder="Digite a senha de acesso" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+        <span class="pw-eye" id="pwe" onclick="togglePw()">👁</span>
+      </div>
+      <button class="l-btn" onclick="doLogin()">Entrar</button>
+      <div class="l-err" id="lerr">❌ Senha incorreta. Tente novamente.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<div class="hdr">
+  <div class="hdr-brand">
+    <div><div class="hdr-logo">MG FREIOS</div><div style="font-size:10px;color:var(--muted);letter-spacing:.4px">+ DMMG (TECMG)</div></div>
+    <div class="hdr-sep"></div>
+    <div><div class="hdr-name">Dashboard Executivo</div><div class="hdr-sub">Fechamento Mensal · Exercício 2026</div></div>
+  </div>
+  <div class="hdr-right">
+    <div class="chip ok">● Dados confirmados</div>
+    <div class="chip">Mar · Abr · Mai / 2026</div>
+    <div class="chip warn">Meta consolidada: 89%</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active"   onclick="showTab('v')">Visão Geral</div>
+  <div class="tab tm"       onclick="showTab('m')">Março 2026</div>
+  <div class="tab ta"       onclick="showTab('a')">Abril 2026</div>
+  <div class="tab tmi"      onclick="showTab('mi')">Maio 2026</div>
+  <div class="tab tc"       onclick="showTab('c')">Comparativo & Insights</div>
+</div>
+
+<!-- ══ VISÃO GERAL ══════════════════════════════ -->
+<div class="page active" id="page-v">
+
+  <div class="alert al-y">
+    <div class="ai">⚠️</div>
+    <p><strong>Tendência de queda em maio:</strong> após pico de R$3,69M em março, faturamento recuou para R$2,91M em maio (−21%). DMMG caiu −34% MoM e carteira de pedidos despencou 76%. Ação comercial urgente necessária para o 2º semestre.</p>
+  </div>
+
+  <div class="sec">Resumo dos Três Meses</div>
+  <div class="g4">
+    <div class="kpi cp"><div class="kpi-top"><div><div class="kpi-lbl">Melhor Mês — Março</div><div class="kpi-val sm">R$ 3,69M</div><div class="kpi-sub">Pico de 2026</div></div><div class="kpi-ic">🏆</div></div><div class="delta d-up">▲ +18,05% YTD</div></div>
+    <div class="kpi ct"><div class="kpi-top"><div><div class="kpi-lbl">Faturamento Abril</div><div class="kpi-val sm">R$ 3,26M</div><div class="kpi-sub">2º melhor mês</div></div><div class="kpi-ic">📊</div></div><div class="delta d-up">▲ +15,65% YTD</div></div>
+    <div class="kpi cb"><div class="kpi-top"><div><div class="kpi-lbl">Faturamento Maio</div><div class="kpi-val sm">R$ 2,91M</div><div class="kpi-sub">Queda em relação a abril</div></div><div class="kpi-ic">📉</div></div><div class="delta d-dn">▼ −10,6% MoM</div></div>
+    <div class="kpi cg"><div class="kpi-top"><div><div class="kpi-lbl">Acumulado YTD Jan–Mai</div><div class="kpi-val sm">R$ 15,21M</div><div class="kpi-sub">+7,19% vs 2025</div></div><div class="kpi-ic">📈</div></div><div class="delta d-up">▲ DMMG +41,30%</div></div>
+  </div>
+
+  <div class="g4 mt">
+    <div class="kpi cr"><div class="kpi-top"><div><div class="kpi-lbl">MG Freios YTD</div><div class="kpi-val sm">−5,14%</div><div class="kpi-sub">Meta: 80% atingida</div></div><div class="kpi-ic">⬇️</div></div><div class="delta d-dn">▼ Gap R$2,49M p/ meta</div></div>
+    <div class="kpi ct"><div class="kpi-top"><div><div class="kpi-lbl">DMMG YTD</div><div class="kpi-val sm">+41,30%</div><div class="kpi-sub">111% da meta anual</div></div><div class="kpi-ic">🚀</div></div><div class="delta d-up">▲ Meta superada</div></div>
+    <div class="kpi cy"><div class="kpi-top"><div><div class="kpi-lbl">Carteira Mai/26</div><div class="kpi-val sm">R$ 300K</div><div class="kpi-sub">vs R$1,27M em abril</div></div><div class="kpi-ic">⚠️</div></div><div class="delta d-dn">▼ −76% MoM — risco</div></div>
+    <div class="kpi cg"><div class="kpi-top"><div><div class="kpi-lbl">Caixa Mai/26</div><div class="kpi-val sm">R$ 1,08M</div><div class="kpi-sub">Melhor patamar do ano</div></div><div class="kpi-ic">🏦</div></div><div class="delta d-up">▲ +R$509K em aplicações</div></div>
+  </div>
+
+  <div class="sec">Evolução do Faturamento</div>
+  <div class="g21">
+    <div class="cc"><h3>Faturamento Mensal — MG Freios & DMMG</h3><div class="csub">Jan/25 a Mai/26 — empilhado por empresa</div><canvas id="cg1" height="195"></canvas></div>
+    <div class="cc"><h3>Mix de Receita por Mês</h3><div class="csub">Participação % de cada empresa</div><canvas id="cg2" height="195"></canvas></div>
+  </div>
+
+  <div class="sec">Meta × Realizado & Caixa Histórico</div>
+  <div class="g2">
+    <div class="cc">
+      <h3>Atingimento de Meta — Jan a Mai/2026</h3><div class="csub">% da meta anual pró-rata (5/12)</div>
+      <div class="mb"><label><span>Consolidado</span><strong>89% · Gap R$1,97M</strong></label><div class="mb-track"><div class="mb-fill mf-y" style="width:89%"></div></div></div>
+      <div class="mb"><label><span>MG Freios</span><strong style="color:var(--red)">80% · Gap R$2,49M</strong></label><div class="mb-track"><div class="mb-fill mf-r" style="width:80%"></div></div></div>
+      <div class="mb" style="margin-bottom:16px"><label><span>DMMG</span><strong style="color:var(--green)">111% ✓ Meta superada</strong></label><div class="mb-track"><div class="mb-fill mf-t" style="width:100%"></div></div></div>
+      <canvas id="cg3" height="140"></canvas>
+    </div>
+    <div class="cc"><h3>Posição de Caixa — Abr/25 a Mai/26</h3><div class="csub">Conta corrente + aplicações financeiras</div><canvas id="cg4" height="245"></canvas></div>
+  </div>
+</div>
+
+<!-- ══ MÊS TEMPLATE — gerado via JS ══ -->
+<div class="page" id="page-m"></div>
+<div class="page" id="page-a"></div>
+<div class="page" id="page-mi"></div>
+
+<!-- ══ COMPARATIVO ══════════════════════════════ -->
+<div class="page" id="page-c">
+
+  <div class="alert al-b">
+    <div class="ai">📊</div>
+    <p><strong>Visão de 3 meses:</strong> Março foi o pico (R$3,69M). Abril manteve nível alto (R$3,26M). Maio quebrou a tendência (R$2,91M) com queda da DMMG −34% MoM. YTD caiu de +18% para +7% em dois meses. Carteira despencou 76% — principal sinal de risco para junho.</p>
+  </div>
+
+  <div class="sec">Painel Comparativo — Março · Abril · Maio 2026</div>
+  <div class="cmp">
+    <div class="crow ch"><div class="cd">Indicador</div><div class="cd">Março/26</div><div class="cd">Abril/26</div><div class="cd">Maio/26</div><div class="cd">Mar→Mai</div></div>
+    <div class="crow"><div class="cd">Faturamento Consolidado</div><div class="cd" style="color:var(--purple)">R$ 3.692.217</div><div class="cd" style="color:var(--teal)">R$ 3.255.036</div><div class="cd" style="color:var(--blue)">R$ 2.910.311</div><div class="cd"><span class="arr dn">▼ −21,2%</span></div></div>
+    <div class="crow alt"><div class="cd" style="padding-left:24px">↳ MG Freios</div><div class="cd">R$ 2.290.821</div><div class="cd">R$ 2.059.808</div><div class="cd">R$ 2.119.915</div><div class="cd"><span class="arr dn">▼ −7,5%</span></div></div>
+    <div class="crow"><div class="cd" style="padding-left:24px">↳ DMMG</div><div class="cd" style="color:var(--teal)">R$ 1.401.396</div><div class="cd" style="color:var(--teal)">R$ 1.195.228</div><div class="cd" style="color:var(--red)">R$ 790.396</div><div class="cd"><span class="arr dn">▼ −43,6%</span></div></div>
+    <div class="crow alt"><div class="cd">Vendas do Mês</div><div class="cd">R$ 2.292.370*</div><div class="cd">R$ 3.776.515</div><div class="cd">R$ 2.614.674</div><div class="cd"><span class="arr eq">—</span></div></div>
+    <div class="crow"><div class="cd">Carteira de Pedidos</div><div class="cd" style="color:var(--dim)">n.d.</div><div class="cd" style="color:var(--green)">R$ 1.265.734</div><div class="cd" style="color:var(--red)">R$ 300.031</div><div class="cd"><span class="arr dn">▼ −76,3% ⚠</span></div></div>
+    <div class="crow alt"><div class="cd">A Receber Total</div><div class="cd" style="color:var(--dim)">n.d.</div><div class="cd">R$ 7.436.343</div><div class="cd">R$ 7.588.464</div><div class="cd"><span class="arr up">▲ +2,0%</span></div></div>
+    <div class="crow"><div class="cd">Saldo de Caixa</div><div class="cd">R$ 788.116</div><div class="cd">R$ 998.273</div><div class="cd" style="color:var(--green)">R$ 1.080.680</div><div class="cd"><span class="arr up">▲ +37,1%</span></div></div>
+    <div class="crow alt"><div class="cd">YTD Crescimento Geral</div><div class="cd" style="color:var(--green)">+18,05%</div><div class="cd" style="color:var(--yellow)">+15,65%</div><div class="cd" style="color:var(--red)">+7,19%</div><div class="cd"><span class="arr dn">▼ −10,9 p.p.</span></div></div>
+    <div class="crow"><div class="cd">YTD MG Freios</div><div class="cd" style="color:var(--yellow)">−1,87%</div><div class="cd" style="color:var(--yellow)">+0,63%</div><div class="cd" style="color:var(--red)">−5,14%</div><div class="cd"><span class="arr dn">▼ Deteriorando</span></div></div>
+    <div class="crow alt"><div class="cd">YTD DMMG</div><div class="cd" style="color:var(--teal)">+80,66%</div><div class="cd" style="color:var(--teal)">+55,35%</div><div class="cd" style="color:var(--teal)">+41,30%</div><div class="cd"><span class="arr dn">▼ −39 p.p. (forte)</span></div></div>
+    <div class="crow"><div class="cd">Meta MG Freios</div><div class="cd" style="color:var(--red)">77%</div><div class="cd" style="color:var(--red)">78%</div><div class="cd" style="color:var(--red)">80%</div><div class="cd"><span class="arr up">▲ Melhora lenta</span></div></div>
+    <div class="crow alt"><div class="cd">Meta DMMG</div><div class="cd" style="color:var(--green)">116%</div><div class="cd" style="color:var(--green)">118%</div><div class="cd" style="color:var(--green)">111%</div><div class="cd"><span class="arr dn">▼ Ainda superando</span></div></div>
+    <div class="crow"><div class="cd">Estoque (Custo Médio)</div><div class="cd">R$ 25,69M</div><div class="cd">R$ 25,61M</div><div class="cd">R$ 25,67M</div><div class="cd"><span class="arr eq">≈ Estável</span></div></div>
+  </div>
+  <p style="font-size:10px;color:var(--dim);margin-bottom:22px">* Vendas Mar/26 = MG Freios por canal. Vendas DMMG de março e carteira de março não disponíveis nos arquivos.</p>
+
+  <div class="sec">Gráficos Comparativos</div>
+  <div class="g2">
+    <div class="cc"><h3>Faturamento por Empresa — Mar · Abr · Mai</h3><div class="csub">Evolução mês a mês por empresa</div><canvas id="cc1" height="200"></canvas></div>
+    <div class="cc"><h3>Tendência YTD — Crescimento Acumulado %</h3><div class="csub">Como o crescimento variou a cada mês de 2026</div><canvas id="cc2" height="200"></canvas></div>
+  </div>
+
+  <div class="sec">Análise de Inteligência Artificial — Visão Consolidada Mar · Abr · Mai</div>
+  <div class="ai-header">
+    <div class="ai-badge">IA · Análise Estratégica Integrada de 3 Meses</div>
+    <span style="font-size:11px;color:var(--dim)">Padrões, previsões, riscos e oportunidades detectados automaticamente</span>
+  </div>
+
+  <!-- HEALTH SCORES COMPARATIVOS -->
+  <div style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:20px 22px;margin-bottom:18px;box-shadow:var(--sh)">
+    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span>📊</span> Score de Saúde da Empresa por Mês
+      <span style="font-size:10px;color:var(--dim);font-weight:400;margin-left:4px">— quanto maior, melhor (exceto Risco)</span>
+    </div>
+    <div id="score-table-cmp"></div>
+    <script>
+    (function(){
+      const rows=[
+        {l:'Comercial',     vals:[72,79,52], inv:false},
+        {l:'Financeiro',    vals:[81,85,88], inv:false},
+        {l:'Operacional',   vals:[78,82,58], inv:false},
+        {l:'Nível de Risco',vals:[35,42,78], inv:true},
+        {l:'Crescimento',   vals:[85,76,44], inv:false},
+      ];
+      function color(v,inv){return inv?(v<40?'#22C55E':v<65?'#F59E0B':'#EF4444'):(v>70?'#22C55E':v>50?'#F59E0B':'#EF4444')}
+      let h=`<div style="display:grid;grid-template-columns:130px repeat(3,1fr);border-radius:8px;overflow:hidden;border:1px solid var(--b1)">
+        <div style="padding:10px 14px;background:var(--s3);font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px">Dimensão</div>
+        <div style="padding:10px 14px;background:var(--s3);font-size:11px;font-weight:700;color:var(--purple);text-align:center;border-left:1px solid var(--b1)">Março/26</div>
+        <div style="padding:10px 14px;background:var(--s3);font-size:11px;font-weight:700;color:var(--teal);text-align:center;border-left:1px solid var(--b1)">Abril/26</div>
+        <div style="padding:10px 14px;background:var(--s3);font-size:11px;font-weight:700;color:var(--blue);text-align:center;border-left:1px solid var(--b1)">Maio/26</div>`;
+      rows.forEach((row,ri)=>{
+        const bg=ri%2===1?'background:rgba(255,255,255,.015);':'';
+        const dv=v=>row.inv?100-v:v;
+        h+=`<div style="padding:9px 14px;${bg}font-size:11px;color:var(--muted);border-top:1px solid var(--b1)">${row.l}</div>`;
+        row.vals.forEach(v=>{
+          const c=color(v,row.inv);
+          h+=`<div style="padding:9px 14px;${bg}text-align:center;border-top:1px solid var(--b1);border-left:1px solid var(--b1)">
+            <span style="font-size:15px;font-weight:800;color:${c}">${dv(v)}</span>
+            <div style="margin:5px auto 0;width:64px;height:4px;background:var(--b2);border-radius:2px;overflow:hidden">
+              <div style="height:100%;width:${v}%;background:${c};border-radius:2px"></div></div>
+            </div>`;
+        });
+      });
+      h+='</div>';
+      document.getElementById('score-table-cmp').innerHTML=h;
+    })();
+    </script>
+  </div>
+
+  <!-- PROJEÇÃO JUN/JUL -->
+  <div class="ai-card ai-wide" style="margin-bottom:18px">
+    <h4>🔮 Projeções para Junho e Julho de 2026 <span class="tag tag-pred">Previsão</span></h4>
+    <p style="margin-bottom:14px">Com base na <strong>tendência dos últimos 3 meses</strong>, sazonalidade histórica de 2025 e nível atual de carteira de pedidos:</p>
+    <div class="proj-grid">
+      <div class="proj-card"><div class="proj-lbl">Fat. Junho/26</div><div class="proj-val" style="color:var(--red)">R$ 2,4–2,7M</div><div class="proj-sub">Sem ação comercial</div></div>
+      <div class="proj-card"><div class="proj-lbl">Fat. Junho/26</div><div class="proj-val" style="color:var(--yellow)">R$ 2,8–3,1M</div><div class="proj-sub">Com ação moderada</div></div>
+      <div class="proj-card"><div class="proj-lbl">Fat. Julho/26</div><div class="proj-val" style="color:var(--yellow)">R$ 2,7–3,0M</div><div class="proj-sub">Recuperação gradual</div></div>
+      <div class="proj-card"><div class="proj-lbl">YTD Jun/26</div><div class="proj-val" style="color:var(--red)">+4–6%</div><div class="proj-sub">Se não houver ação</div></div>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:var(--dim)">⚠ Projeções baseadas em dados históricos e tendências dos arquivos disponíveis. Não consideram fatores externos (câmbio, concorrência, sazonalidade setorial).</p>
+  </div>
+
+  <!-- 9 INSIGHTS INTEGRADOS -->
+  <div class="ai-grid">
+    <div class="ai-card">
+      <h4>📉 Velocidade de Deterioração <span class="tag tag-risk">Risco</span></h4>
+      <p>O YTD caiu de <strong>+18,05% → +7,19%</strong> em apenas dois meses. Uma queda de <strong>10,86 pontos percentuais</strong> em 60 dias é o ritmo mais rápido de deterioração observado no período. Se a trajetória se mantiver, o YTD pode <em>cruzar para negativo em agosto/26</em>.</p>
+    </div>
+    <div class="ai-card">
+      <h4>⚖️ Dependência Crescente da DMMG <span class="tag tag-warn">Alerta</span></h4>
+      <p>Em março, a DMMG representava <strong>38% do faturamento</strong>. Em maio, caiu para <strong>27%</strong>. Paradoxalmente, o grupo depende cada vez mais da DMMG para crescer (ela é a única empresa com YTD positivo), mas ela também é o maior vetor de instabilidade recente.</p>
+    </div>
+    <div class="ai-card">
+      <h4>🔁 Padrão: DMMG oscila fortemente <span class="tag tag-pat">Padrão</span></h4>
+      <p>Análise dos 10 meses disponíveis: DMMG mostra variações mensais de <strong>±30–40%</strong> como padrão — jan/26 R$611K, fev R$1,33M, mar R$1,40M, abr R$1,20M, mai R$790K. <em>Alta volatilidade é estrutural</em> — o planejamento financeiro deve considerar cenários de alta e baixa para esta empresa.</p>
+    </div>
+    <div class="ai-card">
+      <h4>📦 Estoque Estável Esconde Risco de Giro <span class="tag tag-warn">Alerta</span></h4>
+      <p>O estoque ficou praticamente estável entre os 3 meses (<strong>R$25,6M–R$25,7M</strong>). Com faturamento caindo, o índice de cobertura de estoque <em>está aumentando passivamente</em>. Se essa tendência continuar, haverá imobilização de capital excessiva e risco de obsolescência de itens específicos.</p>
+    </div>
+    <div class="ai-card">
+      <h4>💡 Oportunidade: Fev é estruturalmente fraco <span class="tag tag-opp">Oportunidade</span></h4>
+      <p>Em 2025, fevereiro gerou R$2,48M. Em 2026, R$3,05M — crescimento de <strong>+22,6%</strong>. O único mês com melhora consistente. <em>Ações comerciais focadas em janeiro (pré-carnaval)</em> para garantir carteira robusta podem transformar um mês historicamente fraco em diferencial competitivo.</p>
+    </div>
+    <div class="ai-card">
+      <h4>🏦 Caixa Sobe Enquanto Operação Cai <span class="tag tag-fin">Financeiro</span></h4>
+      <p>Mar R$788K → Abr R$998K → Mai R$1,08M. Caixa cresceu <strong>+37%</strong> em 2 meses enquanto o faturamento caiu <strong>−21%</strong>. Esse aparente paradoxo indica <em>forte conversão de recebíveis</em> — mas também pode sinalizar redução de compras e investimentos, o que limita o crescimento futuro.</p>
+    </div>
+    <div class="ai-card">
+      <h4>🎯 Meta DMMG: superada, mas desacelerando <span class="tag tag-pred">Previsão</span></h4>
+      <p>DMMG saiu de <strong>116% → 118% → 111%</strong> da meta. Ainda supera, mas a trajetória é descendente. Se maio for representativo, a empresa pode <em>encerrar 2026 próxima de 100%</em> da meta — perdendo o status de "empresa que supera a meta" e aumentando a pressão sobre MG Freios.</p>
+    </div>
+    <div class="ai-card">
+      <h4>🔗 Correlação Carteira → Faturamento Confirmada <span class="tag tag-pat">Padrão</span></h4>
+      <p>Em abril, carteira alta (R$1,27M) → faturamento alto (R$3,26M). Em maio, carteira baixa (R$300K) → faturamento mais baixo. O <strong>lead time carteira→faturamento</strong> é de aproximadamente <em>30–45 dias</em>. Isso significa que a carteira atual prevê faturamento de junho — e o sinal é negativo.</p>
+    </div>
+    <div class="ai-card">
+      <h4>💼 Concentração Setorial: Agro domina <span class="tag tag-warn">Alerta</span></h4>
+      <p><strong>Máquinas Agrícolas Jacto S.A.</strong> lidera com 8,44% da receita de 12 meses. O setor de máquinas agrícolas responde por um percentual ainda maior quando considerados distribuidores de peças para esse segmento. <em>Exposição ao ciclo do agronegócio</em> é um risco setorial não precificado nos indicadores atuais.</p>
+    </div>
+  </div>
+
+  <div class="sec">Recomendações para o 2º Semestre</div>
+  <div class="g2">
+    <div class="rc"><div class="rc-n">01</div><div><div class="rc-t" style="color:var(--red)">🚨 Recompor Carteira DMMG</div><div class="rc-b">Carteira zerou. Investigar causa e acionar comercial para gerar pedidos nas próximas 2–4 semanas. Prioridade número um do grupo.</div></div></div>
+    <div class="rc"><div class="rc-n">02</div><div><div class="rc-t" style="color:var(--red)">Plano Recuperação MG Freios</div><div class="rc-b">Crescer ~R$415K/mês acima do patamar atual. Recuperar clientes inativos, reforçar canais Reimar, Venda Direta e Morenorte.</div></div></div>
+    <div class="rc"><div class="rc-n">03</div><div><div class="rc-t" style="color:var(--yellow)">Gestão de Recebíveis</div><div class="rc-b">R$7,59M a receber com faturamento em queda. Follow-up sistemático de cobranças e revisão da política de crédito.</div></div></div>
+    <div class="rc"><div class="rc-n">04</div><div><div class="rc-t" style="color:var(--teal)">Auditar Capacidade DMMG</div><div class="rc-b">Cresceu 41% no ano. Identificar causa da queda de 34% em maio — se operacional, investir já. Se comercial, reforçar time.</div></div></div>
+    <div class="rc"><div class="rc-n">05</div><div><div class="rc-t" style="color:var(--blue)">Diversificar Clientes</div><div class="rc-b">Top 3 clientes concentram ~17% da receita. Expansão geográfica e ativação de canais de representação sub-utilizados.</div></div></div>
+    <div class="rc"><div class="rc-n">06</div><div><div class="rc-t" style="color:var(--green)">Aproveitar Saúde Financeira</div><div class="rc-b">Caixa R$1,08M + estoque R$25,7M + recebíveis R$7,6M. Avaliar importação de novas linhas com análise de ROI antes do compromisso.</div></div></div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Dashboard Executivo · MG Freios + DMMG (TECMG) · Março, Abril e Maio de 2026 · Uso interno e confidencial</span>
+  <span>YTD: Mar +18,05% → Abr +15,65% → Mai +7,19%</span>
+</div>
+</div><!-- /app -->
+
+<script>
+// ── CHART DEFAULTS ──────────────────────────
+const scX={ticks:{color:'#8E9BBF',font:{size:10}},grid:{color:'rgba(36,44,66,.8)'}};
+const scY=cb=>({ticks:{color:'#8E9BBF',font:{size:10},callback:cb},grid:{color:'rgba(36,44,66,.8)'}});
+const leg={labels:{color:'#C8D0E8',font:{size:11},boxWidth:10,padding:12}};
+Chart.defaults.color='#8E9BBF';
+
+// ── GLOBAL DATA ─────────────────────────────
+const MES=['Jan/25','Fev/25','Mar/25','Abr/25','Mai/25','Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'];
+const MG=[1904115,2007731,1900661,1902662,2704229,1692311,1720589,2290821,2059808,2119915];
+const DM=[809217,471201,568637,1070615,849799,611102,1328049,1401396,1195228,790396];
+const TOT=MES.map((_,i)=>MG[i]+DM[i]);
+const CL=['Abr/25','Mai/25','Jun/25','Jul/25','Ago/25','Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'];
+const CC=[790222,375935,121,246227,1328610,1280104,434801,281106,297876,67191,190355,388116,494290,571737];
+const AP=[0,0,0,0,0,0,324350,0,0,0,0,400000,503983,508943];
+const CT=CL.map((_,i)=>CC[i]+AP[i]);
+
+// ── MONTH DATA ──────────────────────────────
+const MONTHS = {
+  m: {
+    id:'m', name:'Março 2026', ptag:'ptag-m', color:'var(--purple)',
+    alert:{cls:'al-g',icon:'🏆',text:'<strong>Melhor mês do ano:</strong> Março atingiu R$3,69M — pico de 2026. DMMG chegou a R$1,40M (+80,66% YTD). Canal exportação liderou vendas MG Freios (11,7%). YTD crescia +18% vs 2025.'},
+    fat:3692217, fat_mg:2290821, fat_dmmg:1401396, fat_prev:3048638,
+    mg_base:2226548, mg_espec:64273,
+    vendas:null, vendas_mg:2292370, vendas_dmmg:null,
+    carteira:null, cart_mg:null, cart_dmmg:null,
+    receber:null, rec_mg:null, rec_dmmg:null,
+    caixa_cc:388116, caixa_ap:400000, caixa_tot:788116,
+    estoque_cm:25685592, estoque_uc:27602721,
+    compras:1223271,
+    ytd:18.05, ytd_mg:-1.87, ytd_dmmg:80.66,
+    meta_geral:88, meta_mg:77, meta_dmmg:116,
+    gap_geral:1260733, gap_mg:1721280,
+    mix_mg:62.0, mix_dmmg:38.0,
+    delta_mot:'▲ +21,1% vs Fev/26', delta_cls:'d-up',
+    meta_real_g:9044267, meta_real_mg:5703721, meta_real_dm:3340547,
+    meta_pro_g:10305000*3/12, meta_pro_mg:7425000*3/12, meta_pro_dm:2880000*3/12,
+    canais:[
+      {n:'Expansão Internacional',v:267347,p:11.7},
+      {n:'Venda Direta',v:215186,p:9.4},
+      {n:'Morenorte',v:165753,p:7.2},
+      {n:'Diffuse Representações',v:127001,p:5.5},
+      {n:'Luis Alonso Gervazio',v:123893,p:5.4},
+      {n:'U.S. Monteiro Rep.',v:112390,p:4.9},
+      {n:'J.T.F. Comercio',v:111020,p:4.8},
+      {n:'Reimar Representações',v:104972,p:4.6},
+      {n:'E&M Representações',v:82726,p:3.6},
+      {n:'Coselca Representações',v:79168,p:3.5}
+    ],
+    canais_lbl:'Top 10 Canais de Venda',
+    divL:['Pinça de freio','Sapata de freio','Reparo p/ pistão','Peças Especiais','Conj. freio compl.','Espelho de roda','Suporte pinça','Pino pinça'],
+    divData:[[536316,496529,795169],[392186,375566,489392],[152783,164668,207530],[144593,251708,64274],[88164,93199,161662],[16310,14475,118389],[56084,60935,107721],[60564,57875,75435]],
+    divLabels:['Jan/26','Fev/26','Mar/26'],
+    divColors:['rgba(168,85,247,.25)','rgba(168,85,247,.55)','rgba(168,85,247,.9)'],
+    divBorder:['rgba(168,85,247,.4)','rgba(168,85,247,.7)','rgba(168,85,247,1)'],
+    insights:{mg:'Principal atenção: YTD já em −1,87%. Produtos especiais representaram apenas R$64K (baixo vs outras referências).',dmmg:'Maior mês do período — R$1,40M. Crescimento de +80,66% YTD indica demanda forte e capacidade produtiva pressionada.'},
+    score:{comercial:72,financeiro:81,operacional:78,risco:35,crescimento:85},
+    ai:[
+      {tipo:'warn',tag:'tag-warn',icon:'📊',titulo:'Expansão Internacional concentrada',texto:'O canal <strong>Expansão Comércio Internacional</strong> representou <strong>11,7%</strong> das vendas de março — sozinho. Dependência excessiva de um único canal exportador eleva o risco operacional: câmbio, logística e sazonalidade podem impactar diretamente o faturamento.'},
+      {tipo:'pred',tag:'tag-pred',icon:'🔮',titulo:'Projeção: DMMG sob pressão em 60 dias',texto:'O pico de R$1,40M em março com crescimento de <strong>+80,66% YTD</strong> sugere que a capacidade produtiva está sendo testada. <em>Padrão histórico de produção acelerada</em> tende a ser seguido de queda brusca. Recomendado: auditar capacidade antes do 2º trimestre.'},
+      {tipo:'opp',tag:'tag-opp',icon:'💡',titulo:'Oportunidade: Pinça de freio em expansão',texto:'<strong>Pinça de freio</strong> (MG-3020) atingiu R$795K em março — alta de <strong>+49,2% vs janeiro</strong>. A divisão representa 34,7% do faturamento MG. Tendência de alta consistente sugere oportunidade de ampliar SKUs derivados (reparo, suporte, pino) para capturar mais receita por cliente.'},
+      {tipo:'risk',tag:'tag-risk',icon:'⚠️',titulo:'MG Freios: erosão silenciosa do YTD',texto:'Apesar do bom faturamento mensal, o acumulado já está <strong>−1,87% abaixo de 2025</strong>. O padrão indica que os primeiros dois meses (jan/fev) foram fracos, e março compensou parcialmente. Se abril não mantiver o nível de março, o YTD piora rapidamente.'},
+      {tipo:'fin',tag:'tag-fin',icon:'💰',titulo:'Caixa: recuperação expressiva em março',texto:'O saldo saltou de <strong>R$190K (fev) para R$788K (mar)</strong> — crescimento de <strong>+315%</strong>. Com R$400K em aplicações financeiras, a empresa demonstra disciplina na preservação de liquidez. O ritmo de conversão de recebíveis parece estar melhorando.'},
+      {tipo:'pat',tag:'tag-pat',icon:'🔁',titulo:'Padrão: sazonalidade positiva em março',texto:'Historicamente, março apresenta alta em relação a fevereiro tanto em 2025 quanto em 2026. <em>Padrão de demanda crescente no 1º trimestre</em> sugere que o setor de autopeças pesadas tem ciclo positivo em Q1. Planejar estoque e capacidade para capturar esse padrão em 2027.'},
+    ],
+  },
+  a: {
+    id:'a', name:'Abril 2026', ptag:'ptag-a', color:'var(--teal)',
+    alert:{cls:'al-g',icon:'✅',text:'<strong>Segundo melhor mês:</strong> Abril manteve nível alto (R$3,26M). DMMG com R$1,20M e carteira robusta de R$1,27M indicavam bom pipeline. Vendas superaram o faturamento em R$521K.'},
+    fat:3255036, fat_mg:2059808, fat_dmmg:1195228, fat_prev:3692217,
+    mg_base:1804113, mg_espec:255695,
+    vendas:3776515, vendas_mg:2029955, vendas_dmmg:1746560,
+    carteira:1265734, cart_mg:324326, cart_dmmg:941408,
+    receber:7436343, rec_mg:3731109, rec_dmmg:3705234,
+    caixa_cc:494290, caixa_ap:503983, caixa_tot:998273,
+    estoque_cm:25607369, estoque_uc:27514541,
+    compras:null,
+    ytd:15.65, ytd_mg:0.63, ytd_dmmg:55.35,
+    meta_geral:90, meta_mg:78, meta_dmmg:118,
+    gap_geral:1440697, gap_mg:2136472,
+    mix_mg:63.3, mix_dmmg:36.7,
+    delta_mot:'▼ −11,8% vs Mar/26', delta_cls:'d-dn',
+    meta_real_g:12299303, meta_real_mg:7763529, meta_real_dm:4535775,
+    meta_pro_g:13740000*4/12, meta_pro_mg:9900000*4/12, meta_pro_dm:3840000*4/12,
+    canais:[
+      {n:'Máquinas Agrícolas Jacto S.A.',v:515698,p:6.73},
+      {n:'Muzzupappa José Eduardo',v:267347,p:3.49},
+      {n:'Rede Ancora MT',v:262334,p:3.42},
+      {n:'Fontaine International',v:247856,p:3.23},
+      {n:'Odapel Distribuidora SP',v:203039,p:2.65},
+      {n:'Pemaza Distribuidora',v:181895,p:2.37},
+      {n:'PMZ Distribuidora',v:138391,p:1.81},
+      {n:'Luis Alonso Gervazio',v:132427,p:1.73},
+      {n:'Renavi Distribuidora',v:126569,p:1.65},
+      {n:'Auto Peças Padre Cícero F017',v:107197,p:1.40}
+    ],
+    canais_lbl:'Top 10 Clientes (Jan–Abr/26)',
+    divL:['Pinça de freio','Sapata de freio','Reparo p/ pistão','Peças Especiais','Conj. freio compl.','Suporte pinça','Pino pinça','Espelho de roda'],
+    divData:[[536316,496529,795169,660909],[392186,375566,489392,461298],[152783,164668,207530,176951],[144593,251708,64274,252124],[88164,93199,161662,93240],[64765,53654,107721,80119],[57558,55004,75435,76944],[66649,39112,118389,47067]],
+    divLabels:['Jan/26','Fev/26','Mar/26','Abr/26'],
+    divColors:['rgba(20,184,166,.2)','rgba(20,184,166,.42)','rgba(20,184,166,.65)','rgba(20,184,166,.9)'],
+    divBorder:['rgba(20,184,166,.35)','rgba(20,184,166,.6)','rgba(20,184,166,.8)','rgba(20,184,166,1)'],
+    insights:{mg:'Produtos especiais (R$255K) foram altos — monitorar rentabilidade. Vendas (R$2,03M) ≈ faturamento indica pipeline equilibrado.',dmmg:'Melhor resultado do período com R$1,20M. Carteira de R$941K era promissora — queda em maio sugere conversão sem reposição.'},
+    score:{comercial:79,financeiro:85,operacional:82,risco:42,crescimento:76},
+    ai:[
+      {tipo:'warn',tag:'tag-warn',icon:'⚠️',titulo:'Vendas DMMG (R$1,75M) muito acima do faturamento',texto:'As vendas da DMMG em abril (<strong>R$1,75M</strong>) superaram o faturamento (<strong>R$1,20M</strong>) em R$551K. Isso gera um backlog considerável — o que é positivo — mas exige <em>atenção à capacidade de entrega</em>. Se a empresa não conseguir converter esse backlog rapidamente, há risco de cancelamento e frustração do cliente.'},
+      {tipo:'risk',tag:'tag-risk',icon:'🔴',titulo:'Carteira MG Freios (R$324K): nível insuficiente',texto:'Apesar do bom faturamento de abril, a carteira de pedidos da MG Freios ficou em apenas <strong>R$324K</strong> — equivalente a <strong>15,7% do faturamento mensal</strong>. Nível saudável seria ≥50% do faturamento. O resultado de maio confirmou: a carteira baixa antecipou a queda.'},
+      {tipo:'pred',tag:'tag-pred',icon:'🔮',titulo:'Sinal antecedente: vendas caindo, carteira caindo',texto:'As vendas totais de abril (<strong>R$3,78M</strong>) foram <strong>+16%</strong> acima do faturamento — bom sinal. Porém, esse diferencial estava concentrado na DMMG. A <em>velocidade de conversão de pedidos em maio</em> seria o teste. O resultado confirmou o risco: conversão sem reposição.'},
+      {tipo:'opp',tag:'tag-opp',icon:'💡',titulo:'Produtos especiais MG: margem e mix',texto:'Os <strong>produtos especiais</strong> de abril atingiram <strong>R$255K</strong> — o maior do período analisado, equivalente a <strong>12,4% do faturamento MG</strong>. Esse mix mais nobre tende a ter margens superiores. Recomendado: analisar rentabilidade vs produtos regulares e potencializar a linha especial.'},
+      {tipo:'fin',tag:'tag-fin',icon:'💰',titulo:'Caixa saudável com R$504K em aplicações',texto:'Abril encerrou com <strong>R$998K em caixa</strong>, sendo R$504K em aplicações financeiras — o que demonstra gestão proativa da liquidez. Com A Receber de R$7,44M e caixa crescendo, a empresa está <em>financeiramente estável</em>. O risco operacional supera o risco financeiro.'},
+      {tipo:'pat',tag:'tag-pat',icon:'🔁',titulo:'Padrão: abril historicamente forte',texto:'Em 2025, abril gerou <strong>R$2,97M</strong>. Em 2026, <strong>R$3,26M</strong> — crescimento de <strong>+9,6%</strong>. O mês de abril mostra consistência de demanda no setor. <em>Concentrar esforços comerciais em março para garantir carteira e converter em abril</em> parece a estratégia mais eficiente.'},
+    ],
+  },
+  mi: {
+    id:'mi', name:'Maio 2026', ptag:'ptag-mi', color:'var(--blue)',
+    alert:{cls:'al-r',icon:'🔴',text:'<strong>Reversão de tendência:</strong> Maio quebrou a sequência acima de R$3M. DMMG recuou −33,9% MoM e carteira despencou 76%. MG Freios acumula −5,14% vs 2025. Ação urgente necessária para não comprometer o 2º semestre.'},
+    fat:2910311, fat_mg:2119915, fat_dmmg:790396, fat_prev:3255036,
+    mg_base:1746966, mg_espec:372949,
+    vendas:2614674, vendas_mg:2093424, vendas_dmmg:521250,
+    carteira:300031, cart_mg:300031, cart_dmmg:0,
+    receber:7588464, rec_mg:3993473, rec_dmmg:3594992,
+    caixa_cc:571737, caixa_ap:508943, caixa_tot:1080680,
+    estoque_cm:25671373, estoque_uc:27533532,
+    compras:null,
+    ytd:7.19, ytd_mg:-5.14, ytd_dmmg:41.30,
+    meta_geral:89, meta_mg:80, meta_dmmg:111,
+    gap_geral:1965386, gap_mg:2491557,
+    mix_mg:72.8, mix_dmmg:27.2,
+    delta_mot:'▼ −10,6% vs Abr/26', delta_cls:'d-dn',
+    meta_real_g:15209614, meta_real_mg:9883443, meta_real_dm:5326171,
+    meta_pro_g:17175000*5/12, meta_pro_mg:12375000*5/12, meta_pro_dm:4800000*5/12,
+    canais:[
+      {n:'Máquinas Agrícolas Jacto S.A.',v:815329,p:8.44},
+      {n:'Rede Ancora MT Importadora',v:554965,p:5.74},
+      {n:'Muzzupappa José Eduardo',v:267347,p:2.77},
+      {n:'Fontaine International',v:247856,p:2.56},
+      {n:'Odapel Distribuidora SP',v:229082,p:2.37},
+      {n:'Pemaza Distribuidora',v:213174,p:2.21},
+      {n:'PMZ Distribuidora',v:166586,p:1.72},
+      {n:'Luis Alonso Gervazio',v:164585,p:1.70},
+      {n:'Renavi Distribuidora',v:152143,p:1.57},
+      {n:'JPA Distrib. Peças Auto.',v:138480,p:1.43}
+    ],
+    canais_lbl:'Top 10 Clientes (12 meses)',
+    divL:['Pinça de freio','Sapata de freio','Reparo p/ pistão','Peças Especiais','Conj. freio compl.','Suporte pinça','Pino pinça','Espelho de roda'],
+    divData:[[536316,496529,795169,660909,null],[392186,375566,489392,461298,null],[152783,164668,207530,176951,null],[144593,251708,64274,252124,null],[88164,93199,161662,93240,null],[64765,53654,107721,80119,null],[57558,55004,75435,76944,null],[66649,39112,118389,47067,null]],
+    divLabels:['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26*'],
+    divColors:['rgba(79,142,247,.2)','rgba(79,142,247,.4)','rgba(79,142,247,.6)','rgba(79,142,247,.8)','rgba(79,142,247,.15)'],
+    divBorder:['rgba(79,142,247,.35)','rgba(79,142,247,.55)','rgba(79,142,247,.75)','rgba(79,142,247,.95)','rgba(79,142,247,.3)'],
+    insights:{mg:'Produtos especiais subiram para R$373K — investigar se há impacto de margem. Carteira de apenas R$300K representa risco imediato para junho.',dmmg:'Queda de −33,9% MoM e backlog zerado são os alertas mais críticos do fechamento. Causa ainda não identificada nos arquivos disponíveis.'},
+    score:{comercial:52,financeiro:88,operacional:58,risco:78,crescimento:44},
+    ai:[
+      {tipo:'risk',tag:'tag-risk',icon:'🚨',titulo:'DMMG: queda de −33,9% — anomalia crítica',texto:'A queda da DMMG de <strong>R$1,20M → R$790K</strong> em apenas um mês é estatisticamente atípica para uma empresa com tendência de crescimento de +41%. <em>Três hipóteses:</em> (1) cliente grande pausou pedidos, (2) problema produtivo/logístico, (3) sazonalidade setorial. Cada hipótese exige uma resposta diferente — identificação urgente.'},
+      {tipo:'risk',tag:'tag-risk',icon:'📉',titulo:'Carteira: colapso de 76% — alerta máximo para junho',texto:'A carteira caiu de <strong>R$1,27M para R$300K</strong> em um mês. Usando a taxa histórica de conversão carteira→faturamento (~85%), o modelo estima <strong>faturamento de junho em ~R$2,5M–R$2,7M</strong> — o pior resultado de 2026. Sem recomposição urgente de pedidos, o 2º semestre começa em crise.'},
+      {tipo:'warn',tag:'tag-warn',icon:'⚠️',titulo:'MG Freios: produtos especiais subiram para 17,6%',texto:'Os produtos especiais saltaram para <strong>R$373K</strong> em maio (17,6% do faturamento MG), vs R$255K em abril (12,4%) e R$64K em março (2,8%). Variação tão acentuada merece atenção: <em>pode indicar substituição de produtos regulares por especiais</em> (impacto de margem) ou oportunidade emergente que deve ser capitalizada.'},
+      {tipo:'pred',tag:'tag-pred',icon:'🔮',titulo:'Projeção Jun/26: R$2,4M–R$2,8M se não houver ação',texto:'Com base na carteira atual (R$300K), sazonalidade histórica e tendência de queda da DMMG, o modelo projeta <strong>faturamento de junho entre R$2,4M e R$2,8M</strong> — queda de 4–17% vs maio. Para recuperar o nível de abril (R$3,26M), seria necessário aumentar a carteira para ao menos <em>R$800K em pedidos</em> nos próximos 15 dias.'},
+      {tipo:'fin',tag:'tag-fin',icon:'💰',titulo:'Caixa forte enquanto operação fraqueja — janela rara',texto:'Paradoxalmente, maio tem o <strong>melhor caixa do ano (R$1,08M)</strong> enquanto a operação dá sinais de alerta. Essa janela de liquidez é rara e estratégica: <em>permite investir em importação de novas linhas, marketing agressivo ou ações comerciais</em> sem comprometer o capital de giro. A janela pode fechar rapidamente se junho confirmar a queda.'},
+      {tipo:'opp',tag:'tag-opp',icon:'💡',titulo:'Concentração: top 2 clientes valem 14% da receita',texto:'Jacto (8,44%) + Rede Ancora (5,74%) = <strong>14,18% da receita de 12 meses</strong>. Alta concentração = risco, mas também oportunidade: <em>aprofundar o relacionamento com esses clientes</em> (aumentar share of wallet, lançar novas linhas, negociar contratos de longo prazo) pode ser mais rentável que prospectar novos.'},
+    ],
+  }
+};
+
+// ── RENDER MONTH PAGE ────────────────────────
+const charts = {};
+function renderMonth(d){
+  const f=v=>v!=null?'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}):'<span style="color:var(--dim)">n.d.</span>';
+  const fp=v=>v!=null?v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+  const delta_fat=d.fat_prev?((d.fat-d.fat_prev)/d.fat_prev*100).toFixed(1):null;
+
+  return `
+  <div class="ptag ${d.ptag}">📅 ${d.name}</div>
+  <div class="alert ${d.alert.cls}"><div class="ai">${d.alert.icon}</div><p>${d.alert.text}</p></div>
+
+  <div class="sec">KPIs do Mês</div>
+  <div class="g4">
+    <div class="kpi" style="border-top:2px solid ${d.color}">
+      <div class="kpi-top"><div><div class="kpi-lbl">Faturamento Total</div><div class="kpi-val sm">${f(d.fat)}</div></div><div class="kpi-ic" style="background:rgba(255,255,255,.04)">📊</div></div>
+      <div class="delta ${d.delta_cls}">${d.delta_mot}</div>
+    </div>
+    <div class="kpi cb">
+      <div class="kpi-top"><div><div class="kpi-lbl">MG Freios</div><div class="kpi-val sm">${f(d.fat_mg)}</div><div class="kpi-sub">${d.mix_mg.toFixed(1)}% do total</div></div><div class="kpi-ic">🔵</div></div>
+      <div class="delta d-nt">Especiais: ${f(d.mg_espec)}</div>
+    </div>
+    <div class="kpi ct">
+      <div class="kpi-top"><div><div class="kpi-lbl">DMMG</div><div class="kpi-val sm">${f(d.fat_dmmg)}</div><div class="kpi-sub">${d.mix_dmmg.toFixed(1)}% do total</div></div><div class="kpi-ic">🟢</div></div>
+      <div class="delta ${d.ytd_dmmg>0?'d-up':'d-dn'}">YTD: ${d.ytd_dmmg>0?'▲':'▼'} ${d.ytd_dmmg}%</div>
+    </div>
+    <div class="kpi ${d.ytd>10?'cg':d.ytd>0?'cy':'cr'}">
+      <div class="kpi-top"><div><div class="kpi-lbl">YTD Crescimento Geral</div><div class="kpi-val sm ${Math.abs(d.ytd)<10?'sm':''}">${d.ytd>0?'+':''}${d.ytd}%</div><div class="kpi-sub">Jan–${d.name.split(' ')[0]} vs 2025</div></div><div class="kpi-ic">📈</div></div>
+      <div class="delta ${d.ytd>0?'d-up':'d-dn'}">${d.ytd>0?'▲':'▼'} R$ ${(d.meta_real_g/1e6).toFixed(2)}M acumulado</div>
+    </div>
+  </div>
+
+  <div class="g4 mt">
+    <div class="kpi ${d.vendas?'cg':''}">
+      <div class="kpi-top"><div><div class="kpi-lbl">Vendas do Mês</div><div class="kpi-val sm ${!d.vendas?'kpi-nd':''}">${d.vendas?f(d.vendas):'n.d.'}</div>${d.vendas?`<div class="kpi-sub">MG ${f(d.vendas_mg)} · DMMG ${d.vendas_dmmg?f(d.vendas_dmmg):'n.d.'}</div>`:''}</div><div class="kpi-ic">🛒</div></div>
+      ${d.vendas?`<div class="delta ${d.vendas>d.fat?'d-up':'d-wn'}">${d.vendas>d.fat?'▲ Vendas > Faturamento':'▼ Vendas < Faturamento'}</div>`:`<div class="delta d-nd">Dado não disponível</div>`}
+    </div>
+    <div class="kpi ${d.carteira&&d.carteira>800000?'cg':d.carteira&&d.carteira>400000?'cy':d.carteira?'cr':''}">
+      <div class="kpi-top"><div><div class="kpi-lbl">Carteira de Pedidos</div><div class="kpi-val sm ${!d.carteira?'kpi-nd':''}">${d.carteira?f(d.carteira):'n.d.'}</div>${d.carteira?`<div class="kpi-sub">MG ${f(d.cart_mg)} · DMMG ${f(d.cart_dmmg)}</div>`:''}</div><div class="kpi-ic">📋</div></div>
+      ${d.carteira?`<div class="delta ${d.carteira>800000?'d-up':d.carteira>400000?'d-wn':'d-dn'}">${d.carteira>800000?'▲ Pipeline saudável':d.carteira>400000?'⚠ Pipeline moderado':'▼ Pipeline crítico'}</div>`:`<div class="delta d-nd">Dado não disponível</div>`}
+    </div>
+    <div class="kpi ${d.receber?'cp':''}">
+      <div class="kpi-top"><div><div class="kpi-lbl">A Receber Total</div><div class="kpi-val sm ${!d.receber?'kpi-nd':''}">${d.receber?f(d.receber):'n.d.'}</div>${d.receber?`<div class="kpi-sub">MG ${f(d.rec_mg)} · DMMG ${f(d.rec_dmmg)}</div>`:''}</div><div class="kpi-ic">💰</div></div>
+      ${d.receber?`<div class="delta d-wn">≈ ${(d.receber/d.fat*1).toFixed(1)}x faturamento</div>`:`<div class="delta d-nd">Dado não disponível</div>`}
+    </div>
+    <div class="kpi cg">
+      <div class="kpi-top"><div><div class="kpi-lbl">Saldo de Caixa</div><div class="kpi-val sm">${f(d.caixa_tot)}</div><div class="kpi-sub">C/C ${f(d.caixa_cc)} · Aplic ${f(d.caixa_ap)}</div></div><div class="kpi-ic">🏦</div></div>
+      <div class="delta d-up">▲ ${d.caixa_ap>0?'Com aplicações financeiras':'Apenas conta corrente'}</div>
+    </div>
+  </div>
+
+  <div class="sec">Meta × Realizado & Mix de Receita</div>
+  <div class="g2">
+    <div class="cc">
+      <h3>Meta × Realizado — Jan a ${d.name.split(' ')[0]}/${d.name.split(' ')[1].slice(2)}</h3>
+      <div class="csub">% da meta anual pró-rata</div>
+      <div class="mb"><label><span>Consolidado</span><strong>${d.meta_geral}% · Gap ${f(d.gap_geral)}</strong></label><div class="mb-track"><div class="mb-fill mf-y" style="width:${Math.min(d.meta_geral,100)}%"></div></div></div>
+      <div class="mb"><label><span>MG Freios</span><strong style="color:var(--red)">${d.meta_mg}% · Gap ${f(d.gap_mg)}</strong></label><div class="mb-track"><div class="mb-fill mf-r" style="width:${Math.min(d.meta_mg,100)}%"></div></div></div>
+      <div class="mb" style="margin-bottom:16px"><label><span>DMMG</span><strong style="color:var(--${d.meta_dmmg>=100?'green':'yellow'})">${d.meta_dmmg}% ${d.meta_dmmg>=100?'✓':''}</strong></label><div class="mb-track"><div class="mb-fill mf-t" style="width:${Math.min(d.meta_dmmg,100)}%"></div></div></div>
+      <canvas id="cmeta_${d.id}" height="140"></canvas>
+    </div>
+    <div class="cc">
+      <h3>Mix de Receita — ${d.name}</h3>
+      <div class="csub">Participação de cada empresa no faturamento do mês</div>
+      <div class="dw"><canvas id="cdonut_${d.id}" height="200"></canvas>
+      <div class="dc"><div class="dv" style="color:${d.color}">${d.mix_mg}%</div><div class="dl">MG Freios</div></div></div>
+    </div>
+  </div>
+
+  <div class="sec">Vendas por Canal / Clientes & Divisões de Produto</div>
+  <div class="g2">
+    <div class="cc">
+      <h3>${d.canais_lbl}</h3>
+      <div class="csub">Faturamento por representante ou cliente</div>
+      <canvas id="ccanal_${d.id}" height="230"></canvas>
+    </div>
+    <div class="cc">
+      <h3>Faturamento por Divisão de Produto (Jan–${d.name.split(' ')[0].slice(0,3)}/26)</h3>
+      <div class="csub">Acumulado por divisão de estoque MG Freios${d.id==='mi'?' · Mai/26 sem dados de divisão':''}</div>
+      <canvas id="cdiv_${d.id}" height="230"></canvas>
+    </div>
+  </div>
+
+  <div class="sec">Detalhamento por Empresa</div>
+  <div class="g2">
+    <div class="co mg">
+      <h3>🔵 MG Freios — ${d.name}</h3>
+      <div class="sr"><span class="sl">Faturamento (com especiais)</span><span class="sv">${fp(d.fat_mg)}</span></div>
+      <div class="sr"><span class="sl">Produtos MG Freios</span><span class="sv">${fp(d.mg_base)}</span></div>
+      <div class="sr"><span class="sl">Produtos Especiais</span><span class="sv">${fp(d.mg_espec)}</span></div>
+      <div class="sr"><span class="sl">Vendas do Mês</span><span class="sv">${d.vendas_mg?fp(d.vendas_mg):'<span style="color:var(--dim)">n.d.</span>'}</span></div>
+      <div class="sr"><span class="sl">Carteira de Pedidos</span><span class="sv" style="color:${d.cart_mg?d.cart_mg>300000?'var(--green)':'var(--red)':'var(--dim)'}">${d.cart_mg!=null?fp(d.cart_mg):'n.d.'}</span></div>
+      <div class="sr"><span class="sl">A Receber</span><span class="sv">${d.rec_mg?fp(d.rec_mg):'<span style="color:var(--dim)">n.d.</span>'}</span></div>
+      <div class="sr"><span class="sl">YTD Crescimento</span><span class="sv" style="color:${d.ytd_mg>0?'var(--green)':d.ytd_mg>-3?'var(--yellow)':'var(--red)'}">${d.ytd_mg>0?'+':''}${d.ytd_mg}%</span></div>
+      <div class="sr"><span class="sl">Atingimento Meta Anual</span><span class="sv" style="color:var(--red)">${d.meta_mg}%</span></div>
+      <div class="sr"><span class="sl">Nota estratégica</span><span class="sv" style="font-size:11px;color:var(--t2)">${d.insights.mg}</span></div>
+    </div>
+    <div class="co dm">
+      <h3>🟢 DMMG — ${d.name}</h3>
+      <div class="sr"><span class="sl">Faturamento do Mês</span><span class="sv" style="color:var(--teal)">${fp(d.fat_dmmg)}</span></div>
+      <div class="sr"><span class="sl">Vendas do Mês</span><span class="sv">${d.vendas_dmmg?fp(d.vendas_dmmg):'<span style="color:var(--dim)">n.d.</span>'}</span></div>
+      <div class="sr"><span class="sl">Carteira de Pedidos</span><span class="sv" style="color:${d.cart_dmmg==null?'var(--dim)':d.cart_dmmg>500000?'var(--green)':d.cart_dmmg>0?'var(--yellow)':'var(--red)'}">${d.cart_dmmg==null?'n.d.':d.cart_dmmg===0?'R$ 0,00 ⚠':fp(d.cart_dmmg)}</span></div>
+      <div class="sr"><span class="sl">A Receber</span><span class="sv">${d.rec_dmmg?fp(d.rec_dmmg):'<span style="color:var(--dim)">n.d.</span>'}</span></div>
+      <div class="sr"><span class="sl">YTD Crescimento</span><span class="sv" style="color:var(--teal)">${d.ytd_dmmg>0?'+':''}${d.ytd_dmmg}%</span></div>
+      <div class="sr"><span class="sl">Atingimento Meta Anual</span><span class="sv" style="color:${d.meta_dmmg>=100?'var(--green)':'var(--yellow)'}">${d.meta_dmmg}% ${d.meta_dmmg>=100?'✓':''}</span></div>
+      <div class="sr"><span class="sl">Participação no faturamento</span><span class="sv" style="color:var(--teal)">${d.mix_dmmg.toFixed(1)}%</span></div>
+      <div class="sr"><span class="sl">Nota estratégica</span><span class="sv" style="font-size:11px;color:var(--t2)">${d.insights.dmmg}</span></div>
+    </div>
+  </div>
+
+  <div class="sec">Posição Financeira</div>
+  <div class="g2">
+    <div class="cash">
+      <div class="ci"><span class="cl">💳 Conta Corrente</span><span class="cv">${f(d.caixa_cc)}</span></div>
+      <div class="ci"><span class="cl">📈 Aplicações Financeiras</span><span class="cv">${f(d.caixa_ap)}</span></div>
+      <div class="ci hi"><span class="cl">💰 Saldo Total de Caixa</span><span class="cv">${f(d.caixa_tot)}</span></div>
+      <div class="ci"><span class="cl">📥 A Receber — MG Freios</span><span class="cv">${d.rec_mg?f(d.rec_mg):'n.d.'}</span></div>
+      <div class="ci"><span class="cl">📥 A Receber — DMMG</span><span class="cv">${d.rec_dmmg?f(d.rec_dmmg):'n.d.'}</span></div>
+      <div class="ci hg"><span class="cl">📊 Total a Receber</span><span class="cv">${d.receber?f(d.receber):'n.d.'}</span></div>
+      <div class="ci"><span class="cl">📦 Estoque (Custo Médio)</span><span class="cv">${f(d.estoque_cm)}</span></div>
+      <div class="ci"><span class="cl">📦 Estoque (Última Compra)</span><span class="cv">${f(d.estoque_uc)}</span></div>
+      ${d.compras?`<div class="ci"><span class="cl">🛒 Compras do Mês</span><span class="cv">${f(d.compras)}</span></div>`:''}
+    </div>
+    <div class="cc">
+      <h3>Caixa — Histórico Abr/25 a ${d.name.split(' ')[0].slice(0,3).charAt(0).toUpperCase()+d.name.split(' ')[0].slice(0,3).slice(1)}/26</h3>
+      <div class="csub">Evolução da posição financeira consolidada</div>
+      <canvas id="ccaixa_${d.id}" height="230"></canvas>
+    </div>
+  </div>
+
+  <div class="sec">Análise de Inteligência Artificial — ${d.name}</div>
+  <div class="ai-header">
+    <div class="ai-badge">IA · Análise Automática de Dados</div>
+    <span style="font-size:11px;color:var(--dim)">6 insights gerados com base nos indicadores do período</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px">
+    ${[
+      {l:'Comercial',      desc:'Carteira de pedidos, volume de vendas, diversificação de clientes e canais ativos',       v:d.score.comercial,   c:d.score.comercial>70?'#22C55E':d.score.comercial>50?'#F59E0B':'#EF4444',   inv:false},
+      {l:'Financeiro',     desc:'Posição de caixa, aplicações financeiras, saúde do fluxo e conversão de recebíveis',      v:d.score.financeiro,  c:d.score.financeiro>70?'#22C55E':d.score.financeiro>50?'#F59E0B':'#EF4444',  inv:false},
+      {l:'Operacional',    desc:'Eficiência de entrega, qualidade produtiva, mix de produtos e capacidade instalada',       v:d.score.operacional, c:d.score.operacional>70?'#22C55E':d.score.operacional>50?'#F59E0B':'#EF4444', inv:false},
+      {l:'Risco',          desc:'Concentração de clientes, dependência de canais, volatilidade e ausência de backlog',      v:d.score.risco,       c:d.score.risco<40?'#22C55E':d.score.risco<65?'#F59E0B':'#EF4444',           inv:true},
+      {l:'Crescimento',    desc:'Tendência YTD, atingimento de meta e evolução vs mesmo período do ano anterior',           v:d.score.crescimento, c:d.score.crescimento>70?'#22C55E':d.score.crescimento>50?'#F59E0B':'#EF4444',inv:false},
+    ].map(s=>`
+      <div class="health-card" style="cursor:default">
+        <div class="hl">${s.l}</div>
+        <div class="hv" style="color:${s.c}">${s.inv?100-s.v:s.v}<span style="font-size:11px;font-weight:500">/100</span></div>
+        <div style="margin-top:6px;height:4px;background:var(--b2);border-radius:3px;overflow:hidden"><div style="height:100%;width:${s.v}%;background:${s.c};border-radius:3px"></div></div>
+        <div class="hs">${s.inv?(s.v<40?'Baixo':s.v<65?'Moderado':'Alto'):(s.v>70?'Bom':s.v>50?'Atenção':'Crítico')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;border-top:1px solid var(--b2);padding-top:8px">${s.desc}</div>
+      </div>
+    `).join('')}
+  </div>
+
+  <div class="ai-grid">
+    ${d.ai.map(i=>`
+      <div class="ai-card">
+        <h4>${i.icon} ${i.titulo} <span class="tag ${i.tag}">${i.tipo==='risk'?'Risco':i.tipo==='opp'?'Oportunidade':i.tipo==='warn'?'Alerta':i.tipo==='pred'?'Previsão':i.tipo==='pat'?'Padrão':'Financeiro'}</span></h4>
+        <p>${i.texto}</p>
+      </div>
+    `).join('')}
+  </div>
+  `;
+}
+
+// ── INIT CHARTS PER MONTH ────────────────────
+function initMonthCharts(d){
+  const id=d.id;
+  // Meta
+  new Chart(`cmeta_${id}`,{type:'bar',data:{labels:['Consolidado','MG Freios','DMMG'],datasets:[
+    {label:'Meta pró-rata',data:[d.meta_pro_g,d.meta_pro_mg,d.meta_pro_dm],backgroundColor:'rgba(255,255,255,.05)',borderColor:['rgba(245,158,11,.4)','rgba(239,68,68,.4)','rgba(20,184,166,.4)'],borderWidth:1,borderRadius:3},
+    {label:'Realizado',data:[d.meta_real_g,d.meta_real_mg,d.meta_real_dm],backgroundColor:['rgba(245,158,11,.65)','rgba(239,68,68,.65)','rgba(20,184,166,.65)'],borderColor:['#F59E0B','#EF4444','#14B8A6'],borderWidth:1,borderRadius:3}
+  ]},options:{responsive:true,indexAxis:'y',plugins:{legend:leg},scales:{
+    x:{...scX,ticks:{...scX.ticks,callback:v=>'R$'+(v/1e6).toFixed(1)+'M'}},
+    y:{ticks:{color:'#6B7899',font:{size:11}},grid:{color:'rgba(30,36,56,.7)'}}
+  }}});
+
+  // Donut
+  new Chart(`cdonut_${id}`,{type:'doughnut',data:{
+    labels:[`MG Freios (${d.mix_mg}%)`,`DMMG (${d.mix_dmmg}%)`],
+    datasets:[{data:[d.mix_mg,d.mix_dmmg],backgroundColor:['rgba(79,142,247,.7)','rgba(20,184,166,.7)'],borderColor:['#4F8EF7','#14B8A6'],borderWidth:1.5,hoverOffset:5}]
+  },options:{responsive:true,cutout:'68%',plugins:{legend:{position:'bottom',labels:{color:'#6B7899',font:{size:11},padding:12}}}}});
+
+  // Canais
+  const maxV=Math.max(...d.canais.map(c=>c.v));
+  new Chart(`ccanal_${id}`,{type:'bar',data:{
+    labels:d.canais.map(c=>c.n),
+    datasets:[{label:'Faturamento',data:d.canais.map(c=>c.v),backgroundColor:d.canais.map(c=>`rgba(79,142,247,${.35+c.v/maxV*.55})`),borderColor:'rgba(79,142,247,.7)',borderWidth:1,borderRadius:3}]
+  },options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{
+    x:{...scX,ticks:{...scX.ticks,callback:v=>'R$'+(v/1e3).toFixed(0)+'K'}},
+    y:{ticks:{color:'#6B7899',font:{size:10}},grid:{color:'rgba(30,36,56,.7)'}}
+  }}});
+
+  // Divisões empilhadas
+  const nMeses=d.divLabels.length;
+  const datasets=d.divLabels.map((lbl,i)=>({
+    label:lbl,
+    data:d.divData.map(row=>row[i]||null),
+    backgroundColor:d.divColors[i],
+    borderColor:d.divBorder[i],
+    borderWidth:1,borderRadius:2,stack:'s'
+  }));
+  new Chart(`cdiv_${id}`,{type:'bar',data:{labels:d.divL,datasets},options:{responsive:true,indexAxis:'y',plugins:{legend:leg},scales:{
+    x:{...scX,ticks:{...scX.ticks,callback:v=>'R$'+(v/1e3).toFixed(0)+'K'},stacked:true},
+    y:{ticks:{color:'#6B7899',font:{size:10}},grid:{color:'rgba(30,36,56,.7)'},stacked:true}
+  }}});
+
+  // Caixa
+  const clIdx=CL.indexOf(d.id==='m'?'Mar/26':d.id==='a'?'Abr/26':'Mai/26')+1;
+  const slCL=CL.slice(0,clIdx), slCC=CC.slice(0,clIdx), slAP=AP.slice(0,clIdx), slCT=CT.slice(0,clIdx);
+  new Chart(`ccaixa_${id}`,{type:'bar',data:{labels:slCL,datasets:[
+    {label:'C/C',data:slCC,backgroundColor:'rgba(245,158,11,.5)',borderColor:'#F59E0B',borderWidth:1,borderRadius:3,stack:'c'},
+    {label:'Aplicações',data:slAP,backgroundColor:'rgba(79,142,247,.5)',borderColor:'#4F8EF7',borderWidth:1,borderRadius:3,stack:'c'},
+    {type:'line',label:'Total',data:slCT,borderColor:'#22C55E',backgroundColor:'rgba(34,197,94,.06)',pointRadius:3,pointBackgroundColor:'#22C55E',tension:.3,fill:false}
+  ]},options:{responsive:true,plugins:{legend:leg},scales:{
+    x:{ticks:{color:'#6B7899',font:{size:9}},grid:{color:'rgba(30,36,56,.7)'},stacked:true},
+    y:{...scY(v=>'R$'+(v/1e3).toFixed(0)+'K'),stacked:true}
+  }}});
+}
+
+// ── TABS ─────────────────────────────────────
+function showTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  const idx={v:0,m:1,a:2,mi:3,c:4}[n];
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  if(n==='v'&&!window._v){initVisao();window._v=1}
+  if(n==='m'&&!window._m){document.getElementById('page-m').innerHTML=renderMonth(MONTHS.m);initMonthCharts(MONTHS.m);window._m=1}
+  if(n==='a'&&!window._a){document.getElementById('page-a').innerHTML=renderMonth(MONTHS.a);initMonthCharts(MONTHS.a);window._a=1}
+  if(n==='mi'&&!window._mi){document.getElementById('page-mi').innerHTML=renderMonth(MONTHS.mi);initMonthCharts(MONTHS.mi);window._mi=1}
+  if(n==='c'&&!window._c){initCmp();window._c=1}
+}
+
+// ── VISÃO GERAL ──────────────────────────────
+function initVisao(){
+  new Chart('cg1',{type:'bar',data:{labels:MES,datasets:[
+    {label:'MG Freios',data:MG,backgroundColor:'rgba(79,142,247,.55)',borderColor:'rgba(79,142,247,.8)',borderWidth:1,borderRadius:3,stack:'s'},
+    {label:'DMMG',data:DM,backgroundColor:'rgba(20,184,166,.55)',borderColor:'rgba(20,184,166,.8)',borderWidth:1,borderRadius:3,stack:'s'}
+  ]},options:{responsive:true,plugins:{legend:leg},scales:{
+    x:{...scX,stacked:true},y:{...scY(v=>'R$'+(v/1e6).toFixed(1)+'M'),stacked:true}
+  }}});
+  new Chart('cg2',{type:'bar',data:{labels:MES,datasets:[
+    {label:'MG Freios %',data:MG.map((_,i)=>+(MG[i]/TOT[i]*100).toFixed(1)),backgroundColor:'rgba(79,142,247,.5)',borderColor:'rgba(79,142,247,.7)',borderWidth:1,borderRadius:2,stack:'m'},
+    {label:'DMMG %',data:DM.map((_,i)=>+(DM[i]/TOT[i]*100).toFixed(1)),backgroundColor:'rgba(20,184,166,.5)',borderColor:'rgba(20,184,166,.7)',borderWidth:1,borderRadius:2,stack:'m'}
+  ]},options:{responsive:true,plugins:{legend:leg},scales:{
+    x:{...scX,stacked:true},y:{ticks:{color:'#6B7899',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(30,36,56,.7)'},stacked:true,max:100}
+  }}});
+  new Chart('cg3',{type:'bar',data:{labels:['Consolidado','MG Freios','DMMG'],datasets:[
+    {label:'Meta pró-rata',data:[17175000*5/12,12375000*5/12,4800000*5/12],backgroundColor:'rgba(255,255,255,.05)',borderColor:['rgba(245,158,11,.3)','rgba(239,68,68,.3)','rgba(20,184,166,.3)'],borderWidth:1,borderRadius:3},
+    {label:'Realizado',data:[15209614,9883443,5326171],backgroundColor:['rgba(245,158,11,.65)','rgba(239,68,68,.65)','rgba(20,184,166,.65)'],borderColor:['#F59E0B','#EF4444','#14B8A6'],borderWidth:1,borderRadius:3}
+  ]},options:{responsive:true,indexAxis:'y',plugins:{legend:leg},scales:{
+    x:{...scX,ticks:{...scX.ticks,callback:v=>'R$'+(v/1e6).toFixed(1)+'M'}},
+    y:{ticks:{color:'#6B7899',font:{size:11}},grid:{color:'rgba(30,36,56,.7)'}}
+  }}});
+  new Chart('cg4',{type:'bar',data:{labels:CL,datasets:[
+    {label:'C/C',data:CC,backgroundColor:'rgba(245,158,11,.45)',borderColor:'#F59E0B',borderWidth:1,borderRadius:2,stack:'c'},
+    {label:'Aplicações',data:AP,backgroundColor:'rgba(79,142,247,.45)',borderColor:'#4F8EF7',borderWidth:1,borderRadius:2,stack:'c'},
+    {type:'line',label:'Total',data:CT,borderColor:'#22C55E',backgroundColor:'rgba(34,197,94,.06)',pointRadius:3,pointBackgroundColor:'#22C55E',tension:.3,fill:false}
+  ]},options:{responsive:true,plugins:{legend:leg},scales:{
+    x:{ticks:{color:'#6B7899',font:{size:9}},grid:{color:'rgba(30,36,56,.7)'},stacked:true},
+    y:{...scY(v=>'R$'+(v/1e3).toFixed(0)+'K'),stacked:true}
+  }}});
+}
+
+// ── COMPARATIVO ──────────────────────────────
+function initCmp(){
+  new Chart('cc1',{type:'bar',data:{
+    labels:['MG Freios','DMMG','Consolidado'],
+    datasets:[
+      {label:'Mar/26',data:[2290821,1401396,3692217],backgroundColor:'rgba(168,85,247,.55)',borderColor:'#A855F7',borderWidth:1.5,borderRadius:4},
+      {label:'Abr/26',data:[2059808,1195228,3255036],backgroundColor:'rgba(20,184,166,.55)',borderColor:'#14B8A6',borderWidth:1.5,borderRadius:4},
+      {label:'Mai/26',data:[2119915,790396,2910311],backgroundColor:'rgba(79,142,247,.55)',borderColor:'#4F8EF7',borderWidth:1.5,borderRadius:4}
+    ]
+  },options:{responsive:true,plugins:{legend:leg},scales:{x:scX,y:scY(v=>'R$'+(v/1e6).toFixed(2)+'M')}}});
+
+  new Chart('cc2',{type:'line',data:{
+    labels:['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'],
+    datasets:[
+      {label:'Consolidado %',data:[null,null,18.05,15.65,7.19],borderColor:'#4F8EF7',backgroundColor:'rgba(79,142,247,.07)',pointRadius:5,pointBackgroundColor:'#4F8EF7',tension:.35,fill:true},
+      {label:'MG Freios %',data:[null,null,-1.87,0.63,-5.14],borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,.06)',pointRadius:5,pointBackgroundColor:'#EF4444',tension:.35,fill:true},
+      {label:'DMMG %',data:[null,null,80.66,55.35,41.30],borderColor:'#14B8A6',backgroundColor:'rgba(20,184,166,.06)',pointRadius:5,pointBackgroundColor:'#14B8A6',tension:.35,fill:true}
+    ]
+  },options:{responsive:true,plugins:{legend:leg},scales:{x:scX,y:{...scY(v=>v+'%'),suggestedMin:-10}}}});
+}
+
+// ── LOGIN ─────────────────────────────────────
+const _K=atob('bWdAMjAyNg==');
+window.addEventListener('load',()=>{
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  initVisao();window._v=1;
+});
+</script>
+</body>
+</html>

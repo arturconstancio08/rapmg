@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAP — Dashboard Executivo 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#07090F;--bg2:#0D1117;--bg3:#141922;--card:#111827;--card2:#1a2235;
+  --border:#1e2d40;--text:#e2e8f0;--muted:#64748b;--accent:#3b82f6;
+  --green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6;--teal:#14b8a6;
+  --orange:#f97316;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* LOGIN */
+#login{display:none!important}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px;width:380px;text-align:center}
+.login-logo{font-size:32px;font-weight:800;letter-spacing:2px;color:var(--accent);margin-bottom:8px}
+.login-sub{color:var(--muted);font-size:13px;margin-bottom:32px}
+.login-box input{width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;margin-bottom:12px;outline:none}
+.login-box input:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:12px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+.login-btn:hover{background:#2563eb}
+.login-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+
+/* APP */
+#app{display:block}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.logo{font-size:18px;font-weight:700;letter-spacing:1px;color:var(--accent)}
+.period-badge{background:var(--bg3);border:1px solid var(--border);padding:4px 12px;border-radius:20px;font-size:12px;color:var(--muted)}
+
+.tabs{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto}
+.tab{padding:12px 18px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);white-space:nowrap;transition:.2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.content{padding:24px;max-width:1400px;margin:0 auto}
+.panel{display:none}.panel.active{display:block}
+
+/* CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-card.blue::before{background:var(--accent)}
+.kpi-card.green::before{background:var(--green)}
+.kpi-card.purple::before{background:var(--purple)}
+.kpi-card.yellow::before{background:var(--yellow)}
+.kpi-card.teal::before{background:var(--teal)}
+.kpi-card.red::before{background:var(--red)}
+.kpi-card.orange::before{background:var(--orange)}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.kpi-value{font-size:22px;font-weight:700;margin-bottom:4px}
+.kpi-sub{font-size:12px;color:var(--muted)}
+.kpi-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin-top:6px}
+.badge-up{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-down{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-neutral{background:rgba(59,130,246,.15);color:var(--accent)}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.full{grid-column:1/-1}
+
+.section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.section-title{font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title span{color:var(--text)}
+
+/* PROGRESS BARS */
+.prog-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.prog-label{font-size:13px;min-width:160px;color:var(--text)}
+.prog-bar-wrap{flex:1;height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.prog-bar{height:100%;border-radius:5px;transition:width .6s ease}
+.prog-pct{font-size:13px;font-weight:600;min-width:52px;text-align:right}
+.prog-val{font-size:12px;color:var(--muted);min-width:100px;text-align:right}
+
+/* DIV CARDS */
+.div-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:18px}
+.div-card-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.div-metric{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px}
+.div-metric-val{font-weight:600}
+
+/* SCORE BARS */
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.score-name{font-size:13px;min-width:110px}
+.score-bar-wrap{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.score-bar{height:100%;border-radius:4px}
+.score-val{font-size:13px;font-weight:700;min-width:36px;text-align:right}
+
+/* INSIGHT CARDS */
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.insight-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px;border-left:3px solid}
+.insight-card.risco{border-left-color:var(--red)}
+.insight-card.alerta{border-left-color:var(--yellow)}
+.insight-card.oportunidade{border-left-color:var(--green)}
+.insight-card.previsao{border-left-color:var(--accent)}
+.insight-card.padrao{border-left-color:var(--purple)}
+.insight-card.financeiro{border-left-color:var(--teal)}
+.insight-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.insight-card.risco .insight-type{color:var(--red)}
+.insight-card.alerta .insight-type{color:var(--yellow)}
+.insight-card.oportunidade .insight-type{color:var(--green)}
+.insight-card.previsao .insight-type{color:var(--accent)}
+.insight-card.padrao .insight-type{color:var(--purple)}
+.insight-card.financeiro .insight-type{color:var(--teal)}
+.insight-text{font-size:13px;color:var(--text);line-height:1.5}
+
+/* TABLE */
+.comp-table{width:100%;border-collapse:collapse;font-size:13px}
+.comp-table th{background:var(--bg3);padding:10px 14px;text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border-bottom:1px solid var(--border)}
+.comp-table th:first-child{text-align:left}
+.comp-table td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--border)}
+.comp-table td:first-child{text-align:left;color:var(--muted);font-size:12px}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table tr.total-row td{font-weight:700;color:var(--accent);font-size:14px}
+.comp-table tr:hover td{background:rgba(255,255,255,.02)}
+.pct-up{color:var(--green)}.pct-down{color:var(--red)}.pct-ok{color:var(--yellow)}
+
+/* ALERT BANNER */
+.alert-banner{background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(251,146,60,.08));border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.alert-icon{font-size:20px}
+.alert-text{font-size:14px;color:var(--text)}
+.alert-text strong{color:var(--red)}
+
+/* PROJECTION */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.proj-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:18px}
+.proj-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.proj-label.opt{color:var(--green)}.proj-label.pess{color:var(--red)}
+.proj-month{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.proj-month:last-child{border-bottom:none}
+
+/* RECOMENDAÇÕES */
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.rec-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.rec-num{font-size:24px;font-weight:800;color:var(--accent);opacity:.4;margin-bottom:8px}
+.rec-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.rec-text{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* CHART CONTAINERS */
+.chart-wrap{position:relative;height:260px}
+.chart-wrap-sm{position:relative;height:200px}
+.chart-wrap-lg{position:relative;height:300px}
+
+/* ND */
+.nd{color:var(--muted);font-style:italic}
+
+/* VG - OVERVIEW */
+.vg-hero{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+.vg-hero-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;position:relative}
+.vg-hero-card .month{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+.vg-hero-card .val{font-size:20px;font-weight:700;margin-bottom:4px}
+.vg-hero-card .pct{font-size:13px;font-weight:600}
+.vg-hero-card .bar{position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 12px 12px}
+
+@media(max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.insight-grid{grid-template-columns:repeat(2,1fr)}.vg-hero{grid-template-columns:repeat(3,1fr)}.rec-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="login-logo">RAP</div>
+    <div class="login-sub">Dashboard Executivo · 2026</div>
+    <input type="password" id="pwd" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-err" id="err">Senha incorreta</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="header">
+    <div class="logo">RAP · Dashboard Executivo</div>
+    <div class="period-badge">Janeiro — Maio 2026</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('vg',this)">Visão Geral</div>
+    <div class="tab" onclick="switchTab('jan',this)">Janeiro</div>
+    <div class="tab" onclick="switchTab('fev',this)">Fevereiro</div>
+    <div class="tab" onclick="switchTab('mar',this)">Março</div>
+    <div class="tab" onclick="switchTab('abr',this)">Abril</div>
+    <div class="tab" onclick="switchTab('mai',this)">Maio</div>
+    <div class="tab" onclick="switchTab('comp',this)">Comparativo &amp; Insights</div>
+  </div>
+
+  <!-- VISÃO GERAL -->
+  <div id="panel-vg" class="panel active content">
+    <div class="vg-hero" id="vg-hero"></div>
+    <div class="grid-2">
+      <div class="section">
+        <div class="section-title"><span>Faturamento Mensal — Realizado vs Meta</span></div>
+        <div class="chart-wrap"><canvas id="vg-bar"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>Evolução YTD Acumulado</span></div>
+        <div class="chart-wrap"><canvas id="vg-ytd"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="section">
+        <div class="section-title"><span>% Atingimento da Meta por Mês</span></div>
+        <div class="chart-wrap-sm"><canvas id="vg-meta"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>Mix RAP DIRETO vs Fundição — Acumulado</span></div>
+        <div class="chart-wrap-sm"><canvas id="vg-mix"></canvas></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>RAP DIRETO vs Divisão Fundição — Evolução Mensal</span></div>
+      <div class="chart-wrap-lg"><canvas id="vg-stack"></canvas></div>
+    </div>
+  </div>
+
+  <!-- JANEIRO -->
+  <div id="panel-jan" class="panel content">
+    <div class="kpi-grid" id="kpi-jan"></div>
+    <div class="grid-2">
+      <div class="section">
+        <div class="section-title"><span>Meta × Realizado</span></div>
+        <div id="prog-jan"></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>Mix de Receita por Divisão</span></div>
+        <div class="chart-wrap-sm"><canvas id="donut-jan"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="section">
+        <div class="section-title"><span>Canais RAP DIRETO</span></div>
+        <div class="chart-wrap"><canvas id="canal-jan"></canvas></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>Faturamento por Divisão (Acumulado YTD)</span></div>
+        <div class="chart-wrap"><canvas id="stack-jan"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="section">
+        <div class="section-title"><span>Detalhamento — RAP DIRETO</span></div>
+        <div id="det-rap-jan"></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>Detalhamento — Divisão Fundição</span></div>
+        <div id="det-fund-jan"></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>Posição Financeira</span></div>
+      <div class="nd" style="padding:16px 0">Dados financeiros (caixa, A Receber, Carteira) não disponíveis no arquivo de Janeiro — exibindo n.d.</div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>🤖 Inteligência Artificial — Análise Janeiro</span></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div><div style="margin-bottom:6px;font-size:13px;color:var(--muted)">Scores de Saúde do Negócio</div><div id="scores-jan"></div></div>
+        <div style="display:flex;align-items:center"><div class="chart-wrap-sm" style="width:100%"><canvas id="radar-jan"></canvas></div></div>
+      </div>
+      <div class="insight-grid" id="insights-jan"></div>
+    </div>
+  </div>
+
+  <!-- FEVEREIRO -->
+  <div id="panel-fev" class="panel content">
+    <div class="kpi-grid" id="kpi-fev"></div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Meta × Realizado</span></div><div id="prog-fev"></div></div>
+      <div class="section"><div class="section-title"><span>Mix de Receita por Divisão</span></div><div class="chart-wrap-sm"><canvas id="donut-fev"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Canais RAP DIRETO</span></div><div class="chart-wrap"><canvas id="canal-fev"></canvas></div></div>
+      <div class="section"><div class="section-title"><span>Faturamento por Divisão (Acumulado YTD)</span></div><div class="chart-wrap"><canvas id="stack-fev"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Detalhamento — RAP DIRETO</span></div><div id="det-rap-fev"></div></div>
+      <div class="section"><div class="section-title"><span>Detalhamento — Divisão Fundição</span></div><div id="det-fund-fev"></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span>Posição Financeira</span></div><div class="nd" style="padding:16px 0">Dados financeiros (caixa, A Receber, Carteira) não disponíveis — n.d.</div></div>
+    <div class="section">
+      <div class="section-title"><span>🤖 Inteligência Artificial — Análise Fevereiro</span></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div><div style="margin-bottom:6px;font-size:13px;color:var(--muted)">Scores de Saúde do Negócio</div><div id="scores-fev"></div></div>
+        <div style="display:flex;align-items:center"><div class="chart-wrap-sm" style="width:100%"><canvas id="radar-fev"></canvas></div></div>
+      </div>
+      <div class="insight-grid" id="insights-fev"></div>
+    </div>
+  </div>
+
+  <!-- MARÇO -->
+  <div id="panel-mar" class="panel content">
+    <div class="kpi-grid" id="kpi-mar"></div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Meta × Realizado</span></div><div id="prog-mar"></div></div>
+      <div class="section"><div class="section-title"><span>Mix de Receita por Divisão</span></div><div class="chart-wrap-sm"><canvas id="donut-mar"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Canais RAP DIRETO</span></div><div class="chart-wrap"><canvas id="canal-mar"></canvas></div></div>
+      <div class="section"><div class="section-title"><span>Faturamento por Divisão (Acumulado YTD)</span></div><div class="chart-wrap"><canvas id="stack-mar"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Detalhamento — RAP DIRETO</span></div><div id="det-rap-mar"></div></div>
+      <div class="section"><div class="section-title"><span>Detalhamento — Divisão Fundição</span></div><div id="det-fund-mar"></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span>Posição Financeira</span></div><div class="nd" style="padding:16px 0">Dados financeiros (caixa, A Receber, Carteira) não disponíveis — n.d.</div></div>
+    <div class="section">
+      <div class="section-title"><span>🤖 Inteligência Artificial — Análise Março</span></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div><div style="margin-bottom:6px;font-size:13px;color:var(--muted)">Scores de Saúde do Negócio</div><div id="scores-mar"></div></div>
+        <div style="display:flex;align-items:center"><div class="chart-wrap-sm" style="width:100%"><canvas id="radar-mar"></canvas></div></div>
+      </div>
+      <div class="insight-grid" id="insights-mar"></div>
+    </div>
+  </div>
+
+  <!-- ABRIL -->
+  <div id="panel-abr" class="panel content">
+    <div class="kpi-grid" id="kpi-abr"></div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Meta × Realizado</span></div><div id="prog-abr"></div></div>
+      <div class="section"><div class="section-title"><span>Mix de Receita por Divisão</span></div><div class="chart-wrap-sm"><canvas id="donut-abr"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Canais RAP DIRETO</span></div><div class="chart-wrap"><canvas id="canal-abr"></canvas></div></div>
+      <div class="section"><div class="section-title"><span>Faturamento por Divisão (Acumulado YTD)</span></div><div class="chart-wrap"><canvas id="stack-abr"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Detalhamento — RAP DIRETO</span></div><div id="det-rap-abr"></div></div>
+      <div class="section"><div class="section-title"><span>Detalhamento — Divisão Fundição</span></div><div id="det-fund-abr"></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span>Posição Financeira</span></div><div class="nd" style="padding:16px 0">Dados financeiros (caixa, A Receber, Carteira) não disponíveis — n.d.</div></div>
+    <div class="section">
+      <div class="section-title"><span>🤖 Inteligência Artificial — Análise Abril</span></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div><div style="margin-bottom:6px;font-size:13px;color:var(--muted)">Scores de Saúde do Negócio</div><div id="scores-abr"></div></div>
+        <div style="display:flex;align-items:center"><div class="chart-wrap-sm" style="width:100%"><canvas id="radar-abr"></canvas></div></div>
+      </div>
+      <div class="insight-grid" id="insights-abr"></div>
+    </div>
+  </div>
+
+  <!-- MAIO -->
+  <div id="panel-mai" class="panel content">
+    <div class="kpi-grid" id="kpi-mai"></div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Meta × Realizado</span></div><div id="prog-mai"></div></div>
+      <div class="section"><div class="section-title"><span>Mix de Receita por Divisão</span></div><div class="chart-wrap-sm"><canvas id="donut-mai"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Canais RAP DIRETO</span></div><div class="chart-wrap"><canvas id="canal-mai"></canvas></div></div>
+      <div class="section"><div class="section-title"><span>Faturamento por Divisão (Acumulado YTD)</span></div><div class="chart-wrap"><canvas id="stack-mai"></canvas></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Detalhamento — RAP DIRETO</span></div><div id="det-rap-mai"></div></div>
+      <div class="section"><div class="section-title"><span>Detalhamento — Divisão Fundição</span></div><div id="det-fund-mai"></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span>Posição Financeira</span></div><div class="nd" style="padding:16px 0">Dados financeiros (caixa, A Receber, Carteira) não disponíveis — n.d.</div></div>
+    <div class="section">
+      <div class="section-title"><span>🤖 Inteligência Artificial — Análise Maio</span></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div><div style="margin-bottom:6px;font-size:13px;color:var(--muted)">Scores de Saúde do Negócio</div><div id="scores-mai"></div></div>
+        <div style="display:flex;align-items:center"><div class="chart-wrap-sm" style="width:100%"><canvas id="radar-mai"></canvas></div></div>
+      </div>
+      <div class="insight-grid" id="insights-mai"></div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO -->
+  <div id="panel-comp" class="panel content">
+    <div class="alert-banner">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text"><strong>Atenção:</strong> Maio/26 registrou o pior desempenho do período — R$ 14,2M (91,7% da meta). Fundição de Ferro e canal REI AUTO PARTS puxaram a queda. YTD ainda positivo (+4,3% vs 2025), mas trajetória exige ação imediata.</div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>Tabela Comparativa — Jan a Mai 2026</span></div>
+      <div style="overflow-x:auto"><table class="comp-table" id="comp-table"></table></div>
+    </div>
+    <div class="grid-2">
+      <div class="section"><div class="section-title"><span>Faturamento por Divisão — Mensal</span></div><div class="chart-wrap"><canvas id="comp-div"></canvas></div></div>
+      <div class="section"><div class="section-title"><span>Tendência YTD % vs Meta</span></div><div class="chart-wrap"><canvas id="comp-ytd-pct"></canvas></div></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>Scores de Saúde — Comparativo Mensal</span></div>
+      <div style="overflow-x:auto"><table class="comp-table" id="scores-table"></table></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>Projeção — Próximos 2 Meses (Jun / Jul 2026)</span></div>
+      <div class="proj-grid" id="proj-cards"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>🤖 IA Integrada — 9 Insights Estratégicos</span></div>
+      <div class="insight-grid" id="comp-insights" style="grid-template-columns:repeat(3,1fr)"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span>Recomendações Estratégicas</span></div>
+      <div class="rec-grid" id="rec-cards"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== LOGIN =====================
+function doLogin(){
+  if(document.getElementById('pwd').value==='rap@2026'){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    initAll();
+  } else {
+    document.getElementById('err').style.display='block';
+  }
+}
+
+// ===================== DATA =====================
+const M = {
+  jan:{label:'Janeiro',
+    fat:7314367,orc:6907368,meta_pct:105.9,
+    rap:{real:4031827,orc:3560438},
+    fund:{real:3282540,orc:3346930},
+    rap_ch:{rei:{r:3765578,o:2942150},exp_rei:{r:34887,o:251171},export:{r:216899,o:347415},trading:{r:14463,o:19703}},
+    fund_ch:{ferro:{r:null,o:null},alum:{r:null,o:null},outras:{r:null,o:null}},
+    ytd:7314367,ytd_orc:6907368,ytd_pct:105.9,
+    vs2025:null,
+    scores:{com:88,fin:82,ope:80,ris:72,cre:90}
+  },
+  fev:{label:'Fevereiro',
+    fat:13483652,orc:14168068,meta_pct:95.2,
+    rap:{real:7443472,orc:7757255},
+    fund:{real:6040180,orc:6410812},
+    rap_ch:{rei:{r:6399025,o:7284012},exp_rei:{r:679610,o:214816},export:{r:364836,o:258427},trading:{r:0,o:0}},
+    fund_ch:{ferro:{r:5104916,o:5521387},alum:{r:932482,o:845618},outras:{r:2783,o:43807}},
+    ytd:20798019,ytd_orc:21075436,ytd_pct:98.7,
+    vs2025:-0.7,
+    scores:{com:72,fin:68,ope:75,ris:62,cre:70}
+  },
+  mar:{label:'Março',
+    fat:15949832,orc:16159976,meta_pct:98.7,
+    rap:{real:8783964,orc:9084343},
+    fund:{real:7165867,orc:7075633},
+    rap_ch:{rei:{r:7588569,o:7504134},exp_rei:{r:191222,o:341724},export:{r:981959,o:1231171},trading:{r:22214,o:7314}},
+    fund_ch:{ferro:{r:6007229,o:5987720},alum:{r:1152714,o:1054011},outras:{r:5925,o:33902}},
+    ytd:36747850,ytd_orc:36856746,ytd_pct:99.7,
+    vs2025:6.2,
+    scores:{com:80,fin:78,ope:83,ris:70,cre:78}
+  },
+  abr:{label:'Abril',
+    fat:14617444,orc:14517808,meta_pct:100.7,
+    rap:{real:7937206,orc:7374149},
+    fund:{real:6680238,orc:7143659},
+    rap_ch:{rei:{r:7238263,o:6961903},exp_rei:{r:3383,o:310658},export:{r:695560,o:94855},trading:{r:0,o:6732}},
+    fund_ch:{ferro:{r:5480330,o:6092156},alum:{r:1195008,o:1012809},outras:{r:4901,o:38694}},
+    ytd:51365294,ytd_orc:51374554,ytd_pct:100.0,
+    vs2025:6.9,
+    scores:{com:85,fin:80,ope:78,ris:68,cre:82}
+  },
+  mai:{label:'Maio',
+    fat:14201019,orc:15493125,meta_pct:91.7,
+    rap:{real:7418927,orc:8065165},
+    fund:{real:6782091,orc:7427960},
+    rap_ch:{rei:{r:6493304,o:7101141},exp_rei:{r:218828,o:310658},export:{r:706796,o:595526},trading:{r:0,o:57840}},
+    fund_ch:{ferro:{r:5752882,o:6381378},alum:{r:1018462,o:1012809},outras:{r:10748,o:33773}},
+    ytd:65566313,ytd_orc:66867679,ytd_pct:98.1,
+    vs2025:4.3,
+    scores:{com:65,fin:62,ope:70,ris:58,cre:65}
+  }
+};
+
+const months=['jan','fev','mar','abr','mai'];
+const labels=['Jan','Fev','Mar','Abr','Mai'];
+
+// ===================== UTILS =====================
+function fmt(v){if(v===null||v===undefined)return'<span class="nd">n.d.</span>';
+  if(v>=1e6)return'R$ '+(v/1e6).toFixed(2).replace('.',',')+'M';
+  if(v>=1e3)return'R$ '+(v/1e3).toFixed(0)+'K';
+  return'R$ '+v.toLocaleString('pt-BR');}
+function fmtN(v){if(v===null||v===undefined)return'n.d.';
+  return'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function pctColor(p){return p>=100?'var(--green)':p>=95?'var(--yellow)':'var(--red)'}
+function pctBadge(p){if(p===null)return'<span class="nd">n.d.</span>';
+  const cl=p>=100?'badge-up':p>=95?'badge-neutral':'badge-down';
+  return`<span class="kpi-badge ${cl}">${p.toFixed(1)}% meta</span>`;}
+function scoreColor(s){return s>=80?'var(--green)':s>=65?'var(--yellow)':'var(--red)'}
+
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ===================== KPI CARDS =====================
+function buildKPI(id,d){
+  const el=document.getElementById('kpi-'+id);
+  const ytd_pct=d.ytd_pct;
+  const rap_pct=(d.rap.real/d.rap.orc*100).toFixed(1);
+  const fund_pct=(d.fund.real/d.fund.orc*100).toFixed(1);
+  const cards=[
+    {label:'Faturamento Total',val:fmt(d.fat),sub:'Orçado: '+fmt(d.orc),badge:pctBadge(d.meta_pct),color:'blue'},
+    {label:'RAP DIRETO',val:fmt(d.rap.real),sub:'Meta: '+fmt(d.rap.orc),badge:pctBadge(parseFloat(rap_pct)),color:'teal'},
+    {label:'Divisão Fundição',val:fmt(d.fund.real),sub:'Meta: '+fmt(d.fund.orc),badge:pctBadge(parseFloat(fund_pct)),color:'purple'},
+    {label:'YTD Acumulado',val:fmt(d.ytd),sub:'Meta YTD: '+fmt(d.ytd_orc),badge:pctBadge(ytd_pct),color:'green'},
+    {label:'Vendas Domésticas',val:fmt(d.rap_ch.rei.r),sub:'Meta: '+fmt(d.rap_ch.rei.o),badge:pctBadge(d.rap_ch.rei.r&&d.rap_ch.rei.o?d.rap_ch.rei.r/d.rap_ch.rei.o*100:null),color:'yellow'},
+    {label:'Carteira de Pedidos',val:'<span class="nd">n.d.</span>',sub:'Não disponível',badge:'',color:'orange'},
+    {label:'A Receber',val:'<span class="nd">n.d.</span>',sub:'Não disponível',badge:'',color:'red'},
+    {label:'Caixa',val:'<span class="nd">n.d.</span>',sub:'Não disponível',badge:'',color:'blue'},
+  ];
+  el.innerHTML=cards.map(c=>`
+    <div class="kpi-card ${c.color}">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.val}</div>
+      <div class="kpi-sub">${c.sub}</div>
+      ${c.badge}
+    </div>`).join('');
+}
+
+// ===================== PROGRESS BARS =====================
+function buildProg(id,d){
+  const el=document.getElementById('prog-'+id);
+  const rows=[
+    {label:'TOTAL EMPRESA',real:d.fat,orc:d.orc,pct:d.meta_pct},
+    {label:'RAP DIRETO',real:d.rap.real,orc:d.rap.orc,pct:d.rap.real/d.rap.orc*100},
+    {label:'Divisão Fundição',real:d.fund.real,orc:d.fund.orc,pct:d.fund.real/d.fund.orc*100},
+    {label:'REI AUTO PARTS',real:d.rap_ch.rei.r,orc:d.rap_ch.rei.o,pct:d.rap_ch.rei.r/d.rap_ch.rei.o*100},
+    {label:'Exportação',real:d.rap_ch.export.r,orc:d.rap_ch.export.o,pct:d.rap_ch.export.r/d.rap_ch.export.o*100},
+    {label:'Fundição Ferro',real:d.fund_ch.ferro.r,orc:d.fund_ch.ferro.o,pct:d.fund_ch.ferro.r&&d.fund_ch.ferro.o?d.fund_ch.ferro.r/d.fund_ch.ferro.o*100:null},
+    {label:'Injeção Alumínio',real:d.fund_ch.alum.r,orc:d.fund_ch.alum.o,pct:d.fund_ch.alum.r&&d.fund_ch.alum.o?d.fund_ch.alum.r/d.fund_ch.alum.o*100:null},
+  ];
+  el.innerHTML=rows.map(r=>{
+    if(r.pct===null||isNaN(r.pct))return`<div class="prog-row"><div class="prog-label">${r.label}</div><div class="prog-bar-wrap"><div class="prog-bar" style="width:0%;background:var(--muted)"></div></div><div class="prog-pct nd">n.d.</div><div class="prog-val">${fmt(r.real)}</div></div>`;
+    const w=Math.min(r.pct,120);const col=pctColor(r.pct);
+    return`<div class="prog-row">
+      <div class="prog-label">${r.label}</div>
+      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${w}%;background:${col}"></div></div>
+      <div class="prog-pct" style="color:${col}">${r.pct.toFixed(1)}%</div>
+      <div class="prog-val">${fmt(r.real)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===================== DIVISION DETAIL CARDS =====================
+function buildDet(id,d){
+  const rapEl=document.getElementById('det-rap-'+id);
+  const fundEl=document.getElementById('det-fund-'+id);
+  rapEl.innerHTML=`
+    <div class="div-card">
+      <div class="div-card-title">RAP DIRETO — Detalhamento</div>
+      <div class="div-metric"><span>REI AUTO PARTS</span><span class="div-metric-val">${fmtN(d.rap_ch.rei.r)}</span></div>
+      <div class="div-metric"><span>Fat. para REI Exportar</span><span class="div-metric-val">${fmtN(d.rap_ch.exp_rei.r)}</span></div>
+      <div class="div-metric"><span>Exportação</span><span class="div-metric-val">${fmtN(d.rap_ch.export.r)}</span></div>
+      <div class="div-metric"><span>Trading</span><span class="div-metric-val">${fmtN(d.rap_ch.trading.r)}</span></div>
+      <div class="div-metric" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span style="font-weight:600">TOTAL RAP DIRETO</span><span class="div-metric-val" style="color:var(--teal)">${fmtN(d.rap.real)}</span></div>
+      <div class="div-metric"><span style="font-size:11px;color:var(--muted)">% da Meta</span><span style="color:${pctColor(d.rap.real/d.rap.orc*100)};font-weight:600">${(d.rap.real/d.rap.orc*100).toFixed(1)}%</span></div>
+    </div>`;
+  const ferroVal=d.fund_ch.ferro.r!==null?fmtN(d.fund_ch.ferro.r):'<span class="nd">n.d.</span>';
+  const alumVal=d.fund_ch.alum.r!==null?fmtN(d.fund_ch.alum.r):'<span class="nd">n.d.</span>';
+  const outrasVal=d.fund_ch.outras.r!==null?fmtN(d.fund_ch.outras.r):'<span class="nd">n.d.</span>';
+  fundEl.innerHTML=`
+    <div class="div-card">
+      <div class="div-card-title">DIVISÃO FUNDIÇÃO — Detalhamento</div>
+      <div class="div-metric"><span>Fundição de Ferro</span><span class="div-metric-val">${ferroVal}</span></div>
+      <div class="div-metric"><span>Injeção Alumínio</span><span class="div-metric-val">${alumVal}</span></div>
+      <div class="div-metric"><span>Outras Receitas</span><span class="div-metric-val">${outrasVal}</span></div>
+      <div class="div-metric" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span style="font-weight:600">TOTAL FUNDIÇÃO</span><span class="div-metric-val" style="color:var(--purple)">${fmtN(d.fund.real)}</span></div>
+      <div class="div-metric"><span style="font-size:11px;color:var(--muted)">% da Meta</span><span style="color:${pctColor(d.fund.real/d.fund.orc*100)};font-weight:600">${(d.fund.real/d.fund.orc*100).toFixed(1)}%</span></div>
+    </div>`;
+}
+
+// ===================== SCORES =====================
+const scoreNames={com:'Comercial',fin:'Financeiro',ope:'Operacional',ris:'Risco',cre:'Crescimento'};
+function buildScores(id,d){
+  const el=document.getElementById('scores-'+id);
+  el.innerHTML=Object.entries(d.scores).map(([k,v])=>`
+    <div class="score-row">
+      <div class="score-name">${scoreNames[k]}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${v}%;background:${scoreColor(v)}"></div></div>
+      <div class="score-val" style="color:${scoreColor(v)}">${v}</div>
+    </div>`).join('');
+}
+
+// ===================== INSIGHTS =====================
+const insightsData={
+  jan:[
+    {t:'oportunidade',title:'Desempenho Excepcional',txt:'Janeiro superou a meta em +5,9% — melhor mês do semestre. REI AUTO PARTS doméstico foi o principal driver com R$ 3,8M (+28% vs meta).'},
+    {t:'padrao',title:'Trading Ativo',txt:'Trading registrou R$ 14,5K em janeiro vs meta de R$ 19,7K (73,4%). Canal presente mas abaixo do potencial orçado.'},
+    {t:'alerta',title:'Fat. para REI Exportar Baixo',txt:'Canal de faturamento para exportação realizou apenas R$ 34,9K vs meta de R$ 251K (13,9%). Concentração excessiva no mercado doméstico.'},
+    {t:'previsao',title:'Fundição em Linha',txt:'Divisão Fundição manteve-se próxima da meta em janeiro. Tendência de equilíbrio deve se manter com ajustes operacionais em Ferro.'},
+    {t:'financeiro',title:'YTD Acima da Meta',txt:'Acumulado inicia o ano 5,9% acima do orçado — base sólida para suportar eventuais meses mais fracos no restante do trimestre.'},
+    {t:'risco',title:'Dependência Doméstica',txt:'80%+ do faturamento RAP DIRETO concentrado no canal REI AUTO PARTS doméstico. Baixa diversificação de canais representa risco de concentração.'},
+  ],
+  fev:[
+    {t:'risco',title:'Queda para 95,2% da Meta',txt:'Fevereiro regrediu de 105,9% para 95,2% do orçado — queda de R$ 684K no mês. RAP DIRETO e Fundição ambos abaixo.'},
+    {t:'alerta',title:'REI AUTO PARTS Abaixo',txt:'Canal principal realizou R$ 6,4M vs meta de R$ 7,3M (87,9%). Queda de 5,3% frente a fev/25. Sinaliza desaceleração preocupante.'},
+    {t:'oportunidade',title:'Exportação em Alta',txt:'Canal exportação atingiu R$ 364K — 141% da meta e acima do mês anterior. Diversificação de receita via exportação é ponto positivo.'},
+    {t:'padrao',title:'Fat. REI Exportar Disparou',txt:'Canal de faturamento para REI exportar saltou 316% da meta (R$ 680K vs R$ 215K orçado). Movimento atípico a monitorar.'},
+    {t:'financeiro',title:'YTD Cai para 98,7%',txt:'Acumulado até fevereiro recua abaixo de 100%. A forte performance de janeiro amortece o impacto, mas a tendência é de pressão crescente.'},
+    {t:'risco',title:'Injeção Alumínio Compensa',txt:'Injeção alumínio performou 110% da meta (R$ 932K vs R$ 846K). Sinal positivo na divisão Fundição, mas insuficiente para cobrir a queda em Ferro.'},
+  ],
+  mar:[
+    {t:'oportunidade',title:'Março Mais Forte do Período',txt:'Com R$ 15,95M, março foi o maior mês de faturamento até aqui — 98,7% da meta. Ambas as divisões próximas do orçado.'},
+    {t:'padrao',title:'Fundição Supera Meta',txt:'Divisão Fundição atingiu 101,3% da meta em março (R$ 7,17M) — único mês em que Fundição supera o orçado. Fundição Ferro +0,3% e Alumínio +9,4%.'},
+    {t:'alerta',title:'Exportação Frustra',txt:'Exportação realizou apenas 79,8% da meta (R$ 982K vs R$ 1,23M). Gap de R$ 249K representa oportunidade perdida no canal externo.'},
+    {t:'previsao',title:'YTD Atinge 99,7%',txt:'Acumulado quase fecha o gap do orçado — a R$ 109K de estar no target. Abril e maio precisam manter disciplina para fechar o semestre acima de 100%.'},
+    {t:'financeiro',title:'Crescimento +6,2% vs 2025',txt:'YTD março/26 supera março/25 em R$ 2,15M (+6,2%). Fundição puxando com +5,9% e RAP DIRETO +6,5% — crescimento orgânico consistente.'},
+    {t:'risco',title:'Trading Irregular',txt:'Trading oscila entre zero e R$ 22K com metas variando de zero a R$ 7K. Canal sem previsibilidade — dificultando projeções precisas.'},
+  ],
+  abr:[
+    {t:'oportunidade',title:'Único Mês no Verde',txt:'Abril foi o único mês a superar 100% da meta de faturamento total (100,7%). RAP DIRETO liderou com 107,6% — impulsionado por exportação atípica.'},
+    {t:'alerta',title:'Exportação 733% da Meta',txt:'Exportação atingiu R$ 695K vs meta de R$ 95K — 733% do orçado. Movimento não recorrente que distorceu o resultado positivo de abril.'},
+    {t:'risco',title:'Fundição Ferro Recuou',txt:'Fundição de Ferro realizou apenas 90% da meta em abril (R$ 5,48M vs R$ 6,09M). Queda de R$ 527K que sinaliza dificuldade operacional crescente.'},
+    {t:'padrao',title:'Fat. REI Exportar Colapsou',txt:'Canal de faturamento para REI exportar caiu para R$ 3,4K vs meta de R$ 311K (1,1%). Queda brusca após R$ 680K em fevereiro — alta volatilidade.'},
+    {t:'financeiro',title:'YTD Fecha 100,0%',txt:'Acumulado até abril fecha exatamente em 100% do orçado (R$ 51,37M vs R$ 51,37M meta). Resultado equilibrado mas sem folga.'},
+    {t:'previsao',title:'Injeção Alumínio Consolida',txt:'Alumínio atingiu 118% da meta em abril (R$ 1,195M vs R$ 1,013M). Tendência de crescimento consistente sugere demanda firme neste segmento.'},
+  ],
+  mai:[
+    {t:'risco',title:'Pior Mês do Semestre',txt:'Maio fechou em 91,7% da meta — R$ 14,2M vs R$ 15,5M orçado. Déficit de R$ 1,29M. Ambas as divisões abaixo do orçado simultaneamente.'},
+    {t:'risco',title:'Fundição Ferro em Queda',txt:'Fundição Ferro realizou 90,2% da meta em maio (R$ 5,75M vs R$ 6,38M). Terceiro mês consecutivo abaixo do orçado — tendência preocupante.'},
+    {t:'alerta',title:'REI AUTO PARTS Fraco',txt:'Canal principal caiu para 91,4% da meta (R$ 6,49M vs R$ 7,10M). Queda de R$ 745K frente a abril — maior retração do canal no período.'},
+    {t:'oportunidade',title:'Exportação Segura Canal',txt:'Exportação atingiu 118,7% da meta em maio (R$ 707K) — segundo mês consecutivo acima do orçado. Canal externo é âncora de crescimento.'},
+    {t:'financeiro',title:'YTD Cai para 98,1%',txt:'Acumulado recua de 100% para 98,1% com o fraco resultado de maio. Déficit YTD de R$ 1,3M exige recuperação nos próximos meses.'},
+    {t:'previsao',title:'Alumínio Estável',txt:'Injeção alumínio praticamente no target (100,6% — R$ 1,018M vs R$ 1,013M). Segmento estável serve de base sólida para a divisão Fundição.'},
+  ],
+};
+
+function buildInsights(id,arr){
+  const el=document.getElementById('insights-'+id);
+  el.innerHTML=arr.map(i=>`
+    <div class="insight-card ${i.t}">
+      <div class="insight-type">${i.t.charAt(0).toUpperCase()+i.t.slice(1)}</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">${i.title}</div>
+      <div class="insight-text">${i.txt}</div>
+    </div>`).join('');
+}
+
+// ===================== CHARTS =====================
+const chartDefaults={color:'#e2e8f0',gridColor:'rgba(255,255,255,0.05)',tickColor:'#64748b'};
+function newChart(id,cfg){
+  const ctx=document.getElementById(id);
+  if(!ctx)return;
+  return new Chart(ctx,cfg);
+}
+
+function buildDonut(id,d){
+  newChart('donut-'+id,{type:'doughnut',data:{
+    labels:['RAP DIRETO','Divisão Fundição'],
+    datasets:[{data:[d.rap.real,d.fund.real],backgroundColor:['#14b8a6','#8b5cf6'],borderColor:'#141922',borderWidth:3}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#e2e8f0',font:{size:12}}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}});
+}
+
+function buildCanal(id,d){
+  const ch=d.rap_ch;
+  newChart('canal-'+id,{type:'bar',data:{
+    labels:['REI AUTO PARTS','Fat. REI Exportar','Exportação','Trading'],
+    datasets:[
+      {label:'Realizado',data:[ch.rei.r,ch.exp_rei.r,ch.export.r,ch.trading.r],backgroundColor:'rgba(59,130,246,.7)',borderRadius:4},
+      {label:'Orçado',data:[ch.rei.o,ch.exp_rei.o,ch.export.o,ch.trading.o],backgroundColor:'rgba(100,116,139,.3)',borderRadius:4},
+    ]
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v}},y:{grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+}
+
+function buildStack(id,d,ytdIdx){
+  const mSlice=months.slice(0,ytdIdx+1);
+  const lbls=mSlice.map(k=>M[k].label);
+  const rapData=mSlice.map(k=>M[k].rap.real);
+  const fundData=mSlice.map(k=>M[k].fund.real);
+  newChart('stack-'+id,{type:'bar',data:{
+    labels:lbls,
+    datasets:[
+      {label:'RAP DIRETO',data:rapData,backgroundColor:'rgba(20,184,166,.7)',stack:'s',borderRadius:2},
+      {label:'Fundição',data:fundData,backgroundColor:'rgba(139,92,246,.7)',stack:'s',borderRadius:2},
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{stacked:true,grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+}
+
+function buildRadar(id,d){
+  newChart('radar-'+id,{type:'radar',data:{
+    labels:['Comercial','Financeiro','Operacional','Risco','Crescimento'],
+    datasets:[{label:'Score',data:[d.scores.com,d.scores.fin,d.scores.ope,d.scores.ris,d.scores.cre],
+      backgroundColor:'rgba(59,130,246,.2)',borderColor:'#3b82f6',pointBackgroundColor:'#3b82f6',pointRadius:3}]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,.1)'},ticks:{display:false},pointLabels:{color:'#94a3b8',font:{size:11}}}},plugins:{legend:{display:false}}}});
+}
+
+// ===================== OVERVIEW CHARTS =====================
+function buildOverview(){
+  // Hero cards
+  const hero=document.getElementById('vg-hero');
+  const heroColors=['#3b82f6','#10b981','#f59e0b','#10b981','#ef4444'];
+  hero.innerHTML=months.map((k,i)=>{
+    const d=M[k];const c=d.meta_pct>=100?'#10b981':d.meta_pct>=95?'#f59e0b':'#ef4444';
+    return`<div class="vg-hero-card">
+      <div class="month">${d.label}</div>
+      <div class="val">${fmt(d.fat)}</div>
+      <div class="pct" style="color:${c}">${d.meta_pct.toFixed(1)}% da meta</div>
+      <div class="bar" style="background:${c}"></div>
+    </div>`;
+  }).join('');
+
+  newChart('vg-bar',{type:'bar',data:{
+    labels:labels,
+    datasets:[
+      {label:'Realizado',data:months.map(k=>M[k].fat),backgroundColor:months.map(k=>M[k].meta_pct>=100?'rgba(16,185,129,.7)':M[k].meta_pct>=95?'rgba(245,158,11,.7)':'rgba(239,68,68,.7)'),borderRadius:6},
+      {label:'Orçado',data:months.map(k=>M[k].orc),backgroundColor:'rgba(100,116,139,.25)',borderRadius:6,type:'bar'},
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+
+  newChart('vg-ytd',{type:'line',data:{
+    labels:labels,
+    datasets:[
+      {label:'YTD Realizado',data:months.map(k=>M[k].ytd),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.4,pointRadius:5,pointBackgroundColor:'#3b82f6'},
+      {label:'YTD Orçado',data:months.map(k=>M[k].ytd_orc),borderColor:'rgba(100,116,139,.6)',borderDash:[5,5],tension:.4,pointRadius:3},
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+
+  newChart('vg-meta',{type:'line',data:{
+    labels:labels,
+    datasets:[{label:'% Atingimento',data:months.map(k=>M[k].meta_pct),borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,.1)',fill:true,tension:.4,pointRadius:5,pointBackgroundColor:months.map(k=>M[k].meta_pct>=100?'#10b981':M[k].meta_pct>=95?'#f59e0b':'#ef4444')}]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v+'%'},min:85,max:110}},plugins:{legend:{labels:{color:'#e2e8f0'}},annotation:{annotations:{line100:{type:'line',yMin:100,yMax:100,borderColor:'rgba(16,185,129,.5)',borderDash:[5,5]}}}}}});
+
+  const totalYTD=M.mai.ytd;
+  const rapYTD=months.reduce((a,k)=>a+M[k].rap.real,0);
+  const fundYTD=months.reduce((a,k)=>a+M[k].fund.real,0);
+  newChart('vg-mix',{type:'doughnut',data:{
+    labels:['RAP DIRETO','Divisão Fundição'],
+    datasets:[{data:[rapYTD,fundYTD],backgroundColor:['#14b8a6','#8b5cf6'],borderColor:'#141922',borderWidth:3}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#e2e8f0'}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}}}});
+
+  newChart('vg-stack',{type:'bar',data:{
+    labels:labels,
+    datasets:[
+      {label:'RAP DIRETO',data:months.map(k=>M[k].rap.real),backgroundColor:'rgba(20,184,166,.7)',stack:'s',borderRadius:2},
+      {label:'Fundição',data:months.map(k=>M[k].fund.real),backgroundColor:'rgba(139,92,246,.7)',stack:'s',borderRadius:2},
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{stacked:true,grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+}
+
+// ===================== COMPARATIVO =====================
+function buildComparativo(){
+  // Table
+  const rows=[
+    {label:'Faturamento Total',vals:months.map(k=>M[k].fat),type:'fat'},
+    {label:'→ Meta Orçada',vals:months.map(k=>M[k].orc),type:'orc'},
+    {label:'→ % Meta',vals:months.map(k=>M[k].meta_pct),type:'pct'},
+    {label:'RAP DIRETO',vals:months.map(k=>M[k].rap.real),type:'fat'},
+    {label:'  REI AUTO PARTS',vals:months.map(k=>M[k].rap_ch.rei.r),type:'fat'},
+    {label:'  Exportação',vals:months.map(k=>M[k].rap_ch.export.r),type:'fat'},
+    {label:'Divisão Fundição',vals:months.map(k=>M[k].fund.real),type:'fat'},
+    {label:'  Fundição Ferro',vals:months.map(k=>M[k].fund_ch.ferro.r),type:'fat'},
+    {label:'  Injeção Alumínio',vals:months.map(k=>M[k].fund_ch.alum.r),type:'fat'},
+    {label:'YTD Acumulado',vals:months.map(k=>M[k].ytd),type:'fat'},
+    {label:'YTD % Meta',vals:months.map(k=>M[k].ytd_pct),type:'pct'},
+    {label:'vs 2025 YTD',vals:months.map(k=>M[k].vs2025),type:'vs'},
+  ];
+  const t=document.getElementById('comp-table');
+  t.innerHTML=`<thead><tr><th>Indicador</th>${labels.map(l=>`<th>${l}/26</th>`).join('')}</tr></thead><tbody>`
+    +rows.map(r=>{
+      const vals=r.vals.map(v=>{
+        if(v===null||v===undefined)return`<td class="nd">n.d.</td>`;
+        if(r.type==='pct'){const cl=v>=100?'pct-up':v>=95?'pct-ok':'pct-down';return`<td class="${cl}">${v.toFixed(1)}%</td>`;}
+        if(r.type==='vs'){if(v===null)return`<td class="nd">n.d.</td>`;const cl=v>=0?'pct-up':'pct-down';return`<td class="${cl}">${v>0?'+':''}${v.toFixed(1)}%</td>`;}
+        return`<td>${fmt(v)}</td>`;
+      }).join('');
+      const isTotal=r.label==='Faturamento Total'||r.label==='YTD Acumulado';
+      return`<tr${isTotal?' class="total-row"':''}><td>${r.label}</td>${vals}</tr>`;
+    }).join('')+'</tbody>';
+
+  // Charts
+  newChart('comp-div',{type:'bar',data:{
+    labels:labels,
+    datasets:[
+      {label:'RAP DIRETO',data:months.map(k=>M[k].rap.real),backgroundColor:'rgba(20,184,166,.7)',borderRadius:4},
+      {label:'Fundição',data:months.map(k=>M[k].fund.real),backgroundColor:'rgba(139,92,246,.7)',borderRadius:4},
+    ]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+
+  newChart('comp-ytd-pct',{type:'line',data:{
+    labels:labels,
+    datasets:[{label:'YTD % Meta',data:months.map(k=>M[k].ytd_pct),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.4,pointRadius:5,pointBackgroundColor:months.map(k=>M[k].ytd_pct>=100?'#10b981':M[k].ytd_pct>=98?'#f59e0b':'#ef4444')}]
+  },options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{color:'transparent'},ticks:{color:chartDefaults.tickColor}},y:{grid:{color:chartDefaults.gridColor},ticks:{color:chartDefaults.tickColor,callback:v=>v+'%'},min:94,max:108}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+
+  // Scores table
+  const st=document.getElementById('scores-table');
+  const skeys=[['com','Comercial'],['fin','Financeiro'],['ope','Operacional'],['ris','Risco'],['cre','Crescimento']];
+  st.innerHTML=`<thead><tr><th>Score</th>${labels.map(l=>`<th>${l}/26</th>`).join('')}</tr></thead><tbody>`
+    +skeys.map(([k,n])=>`<tr><td>${n}</td>${months.map(m=>{const v=M[m].scores[k];const c=scoreColor(v);return`<td style="color:${c};font-weight:600">${v}</td>`;}).join('')}</tr>`).join('')
+    +'</tbody>';
+
+  // Projection
+  const metaJun=14691473;const metaJul=14700000;
+  document.getElementById('proj-cards').innerHTML=`
+    <div class="proj-card"><div class="proj-label opt">📈 Cenário Otimista (+5% sobre meta)</div>
+      <div class="proj-month"><span>Junho 2026</span><span style="color:var(--green);font-weight:600">${fmt(metaJun*1.05)}</span></div>
+      <div class="proj-month"><span>Julho 2026</span><span style="color:var(--green);font-weight:600">${fmt(metaJul*1.05)}</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px">Baseado em retomada do canal REI AP e estabilização Fundição Ferro</div>
+    </div>
+    <div class="proj-card"><div class="proj-label pess">📉 Cenário Pessimista (92% da meta)</div>
+      <div class="proj-month"><span>Junho 2026</span><span style="color:var(--red);font-weight:600">${fmt(metaJun*0.92)}</span></div>
+      <div class="proj-month"><span>Julho 2026</span><span style="color:var(--red);font-weight:600">${fmt(metaJul*0.92)}</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px">Continuação da tendência de queda de Maio sem ações corretivas</div>
+    </div>`;
+
+  // 9 insights
+  const compInsights=[
+    {t:'risco',title:'Fundição Ferro em Declínio Estrutural',txt:'Fundição Ferro registrou queda sequencial: Mar R$ 6M → Abr R$ 5,5M → Mai R$ 5,75M. Três meses abaixo ou no limite da meta indicam pressão estrutural no segmento.'},
+    {t:'padrao',title:'Exportação Substitui Canais Internos',txt:'Nos meses em que canais internos enfraquecem (Abr e Mai), exportação compensa: 733% e 119% da meta respectivamente. Canal externo atua como amortecedor de receita.'},
+    {t:'risco',title:'YTD Acumulou R$ 1,3M de Déficit',txt:'Após fechar 100% em abril, o déficit de maio (R$ 1,29M) levou o YTD para -R$ 1,3M abaixo do orçado. Junho precisa superar R$ 14,7M para corrigir a trajetória.'},
+    {t:'oportunidade',title:'Injeção Alumínio: Crescimento Consistente',txt:'Alumínio foi o único sub-segmento com performance positiva crescente: 110% (Fev) → 109% (Mar) → 118% (Abr) → 101% (Mai). Canal de expansão prioritário.'},
+    {t:'previsao',title:'Crescimento vs 2025 Sólido',txt:'YTD maio/26 supera maio/25 em R$ 2,7M (+4,3%). Apesar das oscilações mensais, o grupo cresce acima da inflação frente ao ano anterior.'},
+    {t:'alerta',title:'Fat. REI Exportar Altamente Volátil',txt:'Canal oscilou: Jan R$ 35K → Fev R$ 680K → Mar R$ 191K → Abr R$ 3K → Mai R$ 219K. Variância de 220x entre meses — ausência de planejamento ou contratos estruturados.'},
+    {t:'financeiro',title:'Mix Divisional Estável em 52/48',txt:'RAP DIRETO mantém ~52% e Fundição ~48% do faturamento em todos os meses. Mix equilibrado reduz dependência de um único segmento produtivo.'},
+    {t:'padrao',title:'Janeiro Consistentemente Excepcional',txt:'105,9% da meta em janeiro sugere demanda sazonal forte no início do ano ou carteira represada. Padrão a ser explorado no planejamento de 2027.'},
+    {t:'oportunidade',title:'Meta Junho Viável com Correção',txt:'Meta de R$ 14,7M para junho está dentro da capacidade histórica da empresa (4 de 5 meses superaram esse patamar). Foco em Ferro e REI AP é suficiente para recuperação.'},
+  ];
+  document.getElementById('comp-insights').innerHTML=compInsights.map(i=>`
+    <div class="insight-card ${i.t}">
+      <div class="insight-type">${i.t.charAt(0).toUpperCase()+i.t.slice(1)}</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">${i.title}</div>
+      <div class="insight-text">${i.txt}</div>
+    </div>`).join('');
+
+  // Recomendações
+  const recs=[
+    {n:'01',t:'Plano de Recuperação Fundição Ferro',txt:'Fundição Ferro perdeu R$ 1,1M vs meta em 3 meses. Levantar causas raíz: capacidade produtiva, mix de produtos, carteira de pedidos. Meta: recuperar +5% em Junho.'},
+    {n:'02',t:'Estruturar Canal de Exportação',txt:'Exportação oscila entre R$ 217K e R$ 982K sem padrão. Formalizar contratos, rotas e clientes recorrentes para transformar em canal previsível acima de R$ 700K/mês.'},
+    {n:'03',t:'Expandir Injeção Alumínio',txt:'Único segmento com crescimento consistente acima da meta. Avaliar aumento de capacidade produtiva e captação de novos clientes para consolidar acima de R$ 1,2M/mês.'},
+    {n:'04',t:'Reestruturar Canal Fat. REI Exportar',txt:'Volatilidade extrema (R$ 3K a R$ 680K) indica ausência de política comercial clara. Definir SLA, volumes mínimos e frequência com a REI para estabilizar entre R$ 200-300K/mês.'},
+    {n:'05',t:'Defender Posição REI AUTO PARTS',txt:'Principal canal (R$ 6-7M/mês) apresentou queda em fevereiro e maio. Ações de retenção, revisão de mix e incentivos comerciais são prioritários para sustentar a base de receita.'},
+    {n:'06',t:'Planejamento de Caixa com YTD Negativo',txt:'Com déficit YTD de R$ 1,3M e dados financeiros não disponíveis para análise, recomenda-se integrar posição de caixa e A Receber nos próximos fechamentos para gestão proativa do risco de liquidez.'},
+  ];
+  document.getElementById('rec-cards').innerHTML=recs.map(r=>`
+    <div class="rec-card">
+      <div class="rec-num">${r.n}</div>
+      <div class="rec-title">${r.t}</div>
+      <div class="rec-text">${r.txt}</div>
+    </div>`).join('');
+}
+
+// ===================== INIT ALL =====================
+window.addEventListener("DOMContentLoaded",initAll);
+function initAll(){
+  buildOverview();
+  const idxMap={jan:0,fev:1,mar:2,abr:3,mai:4};
+  months.forEach((k,i)=>{
+    const d=M[k];
+    buildKPI(k,d);
+    buildProg(k,d);
+    buildDet(k,d);
+    buildScores(k,d);
+    buildInsights(k,insightsData[k]);
+    buildDonut(k,d);
+    buildCanal(k,d);
+    buildStack(k,d,i);
+    buildRadar(k,d);
+  });
+  buildComparativo();
+}
+</script>
+</body>
+</html>
